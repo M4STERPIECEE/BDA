@@ -2,7 +2,7 @@ name: features branch
 
 on:
   push:
-    branches: [ 'feature/**', 'fix/**' ]
+    branches: [ 'feature/**', 'fix/**', 'infra/**' ]
   pull_request:
     branches: [ main, develop ]
 
