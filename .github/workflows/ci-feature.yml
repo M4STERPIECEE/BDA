@@ -3,8 +3,6 @@ name: features branch
 on:
   push:
     branches: [ 'feature/**', 'fix/**', 'infra/**' ]
-  pull_request:
-    branches: [ main, develop ]
 
 jobs:
   backend-test:
