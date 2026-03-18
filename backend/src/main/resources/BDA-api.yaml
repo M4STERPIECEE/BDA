@@ -1,33 +1,30 @@
 openapi: 3.0.3
 info:
   title: BDA API
-  description: REST API student grades
+  description: REST API for managing students, grades, and audit logs.
   version: v1
 
 servers:
-  - url: http://localhost:8080/api
-    description: Local development server
+  - url: /api
+    description: Application context path
 
 tags:
   - name: Students
     description: Student endpoints
   - name: Grades
     description: Grade endpoints
-  - name: Subjects
-    description: Subject endpoints
   - name: Audit
     description: Audit log and statistics endpoints
 
 paths:
   /v1/students:
     get:
-      tags:
-        - Students
+      tags: [Students]
       summary: Get all students
       operationId: getAllStudents
       responses:
         '200':
-          description: List of all students
+          description: List of students
           content:
             application/json:
               schema:
@@ -35,8 +32,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/StudentResponse'
     post:
-      tags:
-        - Students
+      tags: [Students]
       summary: Create a new student
       operationId: createStudent
       requestBody:
@@ -55,8 +51,7 @@ paths:
 
   /v1/students/{id}:
     get:
-      tags:
-        - Students
+      tags: [Students]
       summary: Get a student by ID
       operationId: getStudentById
       parameters:
@@ -76,8 +71,7 @@ paths:
         '404':
           description: Student not found
     put:
-      tags:
-        - Students
+      tags: [Students]
       summary: Update a student
       operationId: updateStudent
       parameters:
@@ -101,8 +95,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StudentResponse'
     delete:
-      tags:
-        - Students
+      tags: [Students]
       summary: Delete a student
       operationId: deleteStudent
       parameters:
@@ -118,13 +111,12 @@ paths:
 
   /v1/grades:
     get:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Get all grades
       operationId: getAllGrades
       responses:
         '200':
-          description: List of all grades
+          description: List of grades
           content:
             application/json:
               schema:
@@ -132,8 +124,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/GradeResponse'
     post:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Create a new grade
       operationId: createGrade
       requestBody:
@@ -152,8 +143,7 @@ paths:
 
   /v1/grades/student/{studentId}:
     get:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Get grades by student
       operationId: getGradesByStudent
       parameters:
@@ -175,8 +165,7 @@ paths:
 
   /v1/grades/student/{studentId}/subject/{subjectId}:
     get:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Get a specific grade
       operationId: getGradeById
       parameters:
@@ -199,9 +188,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GradeResponse'
+        '404':
+          description: Grade not found
     put:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Update a grade
       operationId: updateGrade
       parameters:
@@ -231,8 +221,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GradeResponse'
     delete:
-      tags:
-        - Grades
+      tags: [Grades]
       summary: Delete a grade
       operationId: deleteGrade
       parameters:
@@ -252,110 +241,14 @@ paths:
         '204':
           description: Grade deleted successfully
 
-  /v1/subjects:
-    get:
-      tags:
-        - Subjects
-      summary: Get all subjects
-      operationId: getAllSubjects
-      responses:
-        '200':
-          description: List of all subjects
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SubjectResponse'
-    post:
-      tags:
-        - Subjects
-      summary: Create a new subject
-      operationId: createSubject
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubjectRequest'
-      responses:
-        '201':
-          description: Subject created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubjectResponse'
-
-  /v1/subjects/{id}:
-    get:
-      tags:
-        - Subjects
-      summary: Get a subject by ID
-      operationId: getSubjectById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: Subject found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubjectResponse'
-    put:
-      tags:
-        - Subjects
-      summary: Update a subject
-      operationId: updateSubject
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubjectRequest'
-      responses:
-        '200':
-          description: Subject updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SubjectResponse'
-    delete:
-      tags:
-        - Subjects
-      summary: Delete a subject
-      operationId: deleteSubject
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '204':
-          description: Subject deleted successfully
-
   /v1/audit:
     get:
-      tags:
-        - Audit
-      summary: Get all audit logs
-      operationId: getAllAuditLogs
+      tags: [Audit]
+      summary: Get all audit entries
+      operationId: getAllAuditEntries
       responses:
         '200':
-          description: List of all audit logs
+          description: List of audit entries
           content:
             application/json:
               schema:
@@ -365,10 +258,9 @@ paths:
 
   /v1/audit/student/{studentId}:
     get:
-      tags:
-        - Audit
-      summary: Get audit logs by student
-      operationId: getAuditByStudent
+      tags: [Audit]
+      summary: Get audit entries by student
+      operationId: getAuditEntriesByStudent
       parameters:
         - name: studentId
           in: path
@@ -378,7 +270,7 @@ paths:
             format: int32
       responses:
         '200':
-          description: List of audit logs for the student
+          description: List of audit entries for the student
           content:
             application/json:
               schema:
@@ -388,8 +280,7 @@ paths:
 
   /v1/audit/stats:
     get:
-      tags:
-        - Audit
+      tags: [Audit]
       summary: Get audit statistics
       operationId: getAuditStats
       responses:
@@ -404,13 +295,12 @@ components:
   schemas:
     StudentRequest:
       type: object
-      required:
-        - fullName
+      required: [fullName]
       properties:
         fullName:
           type: string
           maxLength: 100
-          description: Full name of the student
+          example: John Doe
 
     StudentResponse:
       type: object
@@ -418,33 +308,33 @@ components:
         studentId:
           type: integer
           format: int32
+          example: 1
         fullName:
           type: string
+          example: John Doe
         average:
           type: number
-          format: decimal
+          format: double
+          example: 15.5
 
     GradeRequest:
       type: object
-      required:
-        - studentId
-        - subjectId
-        - value
+      required: [studentId, subjectId, value]
       properties:
         studentId:
           type: integer
           format: int32
-          description: ID of the student
+          example: 1
         subjectId:
           type: integer
           format: int32
-          description: ID of the subject
+          example: 2
         value:
           type: number
-          format: decimal
+          format: double
           minimum: 0
           maximum: 20
-          description: Grade value (0-20)
+          example: 14.25
 
     GradeResponse:
       type: object
@@ -452,44 +342,21 @@ components:
         studentId:
           type: integer
           format: int32
+          example: 1
         studentName:
           type: string
+          example: John Doe
         subjectId:
           type: integer
           format: int32
+          example: 2
         subjectLabel:
           type: string
+          example: Mathematics
         value:
           type: number
-          format: decimal
-
-    SubjectRequest:
-      type: object
-      required:
-        - label
-        - coefficient
-      properties:
-        label:
-          type: string
-          maxLength: 100
-          description: Subject label
-        coefficient:
-          type: integer
-          format: int32
-          minimum: 1
-          description: Subject coefficient
-
-    SubjectResponse:
-      type: object
-      properties:
-        subjectId:
-          type: integer
-          format: int32
-        label:
-          type: string
-        coefficient:
-          type: integer
-          format: int32
+          format: double
+          example: 14.25
 
     AuditResponse:
       type: object
@@ -497,27 +364,35 @@ components:
         auditId:
           type: integer
           format: int32
+          example: 42
         operationType:
           type: string
-          enum: [INSERT, UPDATE, DELETE]
+          example: UPDATE
         updatedAt:
           type: string
           format: date-time
+          example: '2026-03-19T01:11:16'
         studentId:
           type: integer
           format: int32
+          example: 1
         studentName:
           type: string
+          example: John Doe
         subjectLabel:
           type: string
+          example: Mathematics
         oldValue:
           type: number
-          format: decimal
+          format: double
+          example: 12.0
         newValue:
           type: number
-          format: decimal
+          format: double
+          example: 14.0
         dbUser:
           type: string
+          example: postgres
 
     AuditStatsResponse:
       type: object
@@ -525,18 +400,16 @@ components:
         insertCount:
           type: integer
           format: int64
+          example: 10
         updateCount:
           type: integer
           format: int64
+          example: 4
         deleteCount:
           type: integer
           format: int64
+          example: 2
         totalCount:
           type: integer
           format: int64
-
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+          example: 16

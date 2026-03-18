@@ -26,6 +26,8 @@ version:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    url: /BDA-api.yaml
+    url: /api/v3/api-docs.yaml
   api-docs:
     path: /v3/api-docs
+  packages-to-scan: com.bda.bda.controller.v1
+  paths-to-match: /v1/**
