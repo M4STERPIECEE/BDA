@@ -3,9 +3,9 @@ spring:
     name: bda
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASS}
+    password: ${DB_PASS:bda}
+    username: ${DB_USER:bda}
+    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:bda}
     driver-class-name: org.postgresql.Driver
 
   jpa:
