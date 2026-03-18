@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.openapi.generator") version "7.5.0"
 }
 
 group = "com.bda"
@@ -42,4 +43,16 @@ dependencies {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+openApiGenerate {
+    inputSpec.set("$projectDir/src/main/resources/BDA-api.yaml")
+    outputDir.set("$projectDir/src/generated")
+    generatorName.set("spring")
+    apiPackage.set("com.bda.bda.api")
+    modelPackage.set("com.bda.bda.model.api")
+    configOptions.set(mapOf(
+        "interfaceOnly" to "true",
+        "useOptional" to "true"
+    ))
 }
