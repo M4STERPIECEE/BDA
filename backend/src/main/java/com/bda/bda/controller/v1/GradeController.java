@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/${version.path}/grades")
+@RequestMapping("/${version.path}/grades")
 @RequiredArgsConstructor
 @Tag(name = "Grades")
 public class GradeController {
@@ -39,14 +39,12 @@ public class GradeController {
     }
 
     @PutMapping("/student/{studentId}/subject/{subjectId}")
-    public ResponseEntity<GradeResponse> update(@PathVariable Integer studentId, @PathVariable Integer subjectId,
-            @Valid @RequestBody GradeRequest request) {
+    public ResponseEntity<GradeResponse> update(@PathVariable Integer studentId, @PathVariable Integer subjectId, @Valid @RequestBody GradeRequest request) {
         return ResponseEntity.ok(gradeService.update(studentId, subjectId, request));
     }
 
     @DeleteMapping("/student/{studentId}/subject/{subjectId}")
-    public ResponseEntity<Void> delete(@PathVariable Integer studentId,
-            @PathVariable Integer subjectId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer studentId, @PathVariable Integer subjectId) {
         gradeService.delete(studentId, subjectId);
         return ResponseEntity.noContent().build();
     }

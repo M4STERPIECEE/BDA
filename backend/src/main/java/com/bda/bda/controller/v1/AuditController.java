@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/${version.path}/audit")
+@RequestMapping("/${version.path}/audit")
 @RequiredArgsConstructor
 @Tag(name = "Audit")
 public class AuditController {
