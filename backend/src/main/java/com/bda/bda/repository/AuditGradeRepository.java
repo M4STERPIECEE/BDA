@@ -9,5 +9,6 @@ import java.util.List;
 public interface AuditGradeRepository extends JpaRepository<AuditGrade, Integer> {
     List<AuditGrade> findAllByOrderByUpdatedAtDesc();
     List<AuditGrade> findByStudentIdOrderByUpdatedAtDesc(Integer studentId);
+    List<AuditGrade> findByOperationTypeOrderByUpdatedAtDesc(String operationType);
     long countByOperationType(String operationType);
 }

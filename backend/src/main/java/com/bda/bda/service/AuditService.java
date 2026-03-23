@@ -17,10 +17,15 @@ import java.util.List;
 public class AuditService {
 
     private final AuditGradeRepository auditGradeRepository;
-    private final StudentRepository studentRepository;
+    private final StudentRepository    studentRepository;
 
     public List<AuditResponse> findAll() {
-        return auditGradeRepository.findAllByOrderByUpdatedAtDesc().stream().map(this::toResponse).toList();
+        return auditGradeRepository.findAllByOrderByUpdatedAtDesc()
+                .stream().map(this::toResponse).toList();
+    }
+
+    public List<AuditResponse> findByType(String operationType) {
+        return auditGradeRepository.findByOperationTypeOrderByUpdatedAtDesc(operationType).stream().map(this::toResponse).toList();
     }
 
     public List<AuditResponse> findByStudent(Integer studentId) {

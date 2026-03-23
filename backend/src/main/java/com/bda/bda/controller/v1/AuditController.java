@@ -4,6 +4,7 @@ import com.bda.bda.dto.response.AuditResponse;
 import com.bda.bda.dto.response.AuditStatsResponse;
 import com.bda.bda.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -24,13 +26,19 @@ public class AuditController {
     private final AuditService auditService;
 
     @GetMapping
-    @Operation(summary = "List audit entries")
+    @Operation(summary = "List audit entries (optionally filtered by operation type)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Audit entries returned",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = AuditResponse.class))))
     })
-    public ResponseEntity<List<AuditResponse>> getAll() {
+    public ResponseEntity<List<AuditResponse>> getAll(
+            @Parameter(description = "Filter by operation type: INSERT, UPDATE or DELETE")
+            @RequestParam(required = false) String type) {
+
+        if (type != null && !type.isBlank()) {
+            return ResponseEntity.ok(auditService.findByType(type.toUpperCase()));
+        }
         return ResponseEntity.ok(auditService.findAll());
     }
 
@@ -47,7 +55,7 @@ public class AuditController {
     }
 
     @GetMapping("/stats")
-    @Operation(summary = "Get audit statistics")
+    @Operation(summary = "Get audit statistics (count per operation type)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Audit stats returned",
                     content = @Content(mediaType = "application/json",

@@ -9,14 +9,46 @@ servers:
     description: Application context path
 
 tags:
+  - name: Auth
+    description: Authentication endpoints
   - name: Students
     description: Student endpoints
+  - name: Subjects
+    description: Subject endpoints
   - name: Grades
     description: Grade endpoints
   - name: Audit
-    description: Audit log and statistics endpoints
+    description: Audit log and statistics endpoints (ADMIN only)
+
+security:
+  - bearerAuth: []
 
 paths:
+
+  /v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate and obtain a JWT token
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful — JWT returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Missing or invalid fields
+        '401':
+          description: Invalid credentials
+
   /v1/students:
     get:
       tags: [Students]
@@ -31,6 +63,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StudentResponse'
+        '401':
+          description: Unauthorized
     post:
       tags: [Students]
       summary: Create a new student
@@ -48,6 +82,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: Student already exists
 
   /v1/students/{id}:
     get:
@@ -55,12 +95,7 @@ paths:
       summary: Get a student by ID
       operationId: getStudentById
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/IdPath'
       responses:
         '200':
           description: Student found
@@ -68,6 +103,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentResponse'
+        '401':
+          description: Unauthorized
         '404':
           description: Student not found
     put:
@@ -75,12 +112,7 @@ paths:
       summary: Update a student
       operationId: updateStudent
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/IdPath'
       requestBody:
         required: true
         content:
@@ -94,20 +126,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StudentResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '404':
+          description: Student not found
+        '409':
+          description: Name already taken
     delete:
       tags: [Students]
       summary: Delete a student
       operationId: deleteStudent
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/IdPath'
       responses:
         '204':
           description: Student deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Student not found
+
+  /v1/subjects:
+    get:
+      tags: [Subjects]
+      summary: Get all subjects
+      operationId: getAllSubjects
+      responses:
+        '200':
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectResponse'
+        '401':
+          description: Unauthorized
+    post:
+      tags: [Subjects]
+      summary: Create a new subject
+      operationId: createSubject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+      responses:
+        '201':
+          description: Subject created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '409':
+          description: Subject already exists
+
+  /v1/subjects/{id}:
+    get:
+      tags: [Subjects]
+      summary: Get a subject by ID
+      operationId: getSubjectById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Subject found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Subject not found
+    put:
+      tags: [Subjects]
+      summary: Update a subject
+      operationId: updateSubject
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+      responses:
+        '200':
+          description: Subject updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '404':
+          description: Subject not found
+        '409':
+          description: Label already taken
+    delete:
+      tags: [Subjects]
+      summary: Delete a subject
+      operationId: deleteSubject
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Subject deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Subject not found
 
   /v1/grades:
     get:
@@ -123,6 +261,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GradeResponse'
+        '401':
+          description: Unauthorized
     post:
       tags: [Grades]
       summary: Create a new grade
@@ -140,6 +280,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GradeResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '404':
+          description: Student or subject not found
+        '409':
+          description: Grade already exists for this student/subject pair
 
   /v1/grades/student/{studentId}:
     get:
@@ -147,12 +295,7 @@ paths:
       summary: Get grades by student
       operationId: getGradesByStudent
       parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/StudentIdPath'
       responses:
         '200':
           description: List of grades for the student
@@ -162,6 +305,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GradeResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Student not found
 
   /v1/grades/student/{studentId}/subject/{subjectId}:
     get:
@@ -169,18 +316,8 @@ paths:
       summary: Get a specific grade
       operationId: getGradeById
       parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: subjectId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/StudentIdPath'
+        - $ref: '#/components/parameters/SubjectIdPath'
       responses:
         '200':
           description: Grade found
@@ -188,6 +325,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GradeResponse'
+        '401':
+          description: Unauthorized
         '404':
           description: Grade not found
     put:
@@ -195,18 +334,8 @@ paths:
       summary: Update a grade
       operationId: updateGrade
       parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: subjectId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/StudentIdPath'
+        - $ref: '#/components/parameters/SubjectIdPath'
       requestBody:
         required: true
         content:
@@ -220,32 +349,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GradeResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '404':
+          description: Grade not found
     delete:
       tags: [Grades]
       summary: Delete a grade
       operationId: deleteGrade
       parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: subjectId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/StudentIdPath'
+        - $ref: '#/components/parameters/SubjectIdPath'
       responses:
         '204':
           description: Grade deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Grade not found
 
   /v1/audit:
     get:
       tags: [Audit]
-      summary: Get all audit entries
+      summary: Get all audit entries (optionally filtered by operation type)
       operationId: getAllAuditEntries
+      parameters:
+        - name: type
+          in: query
+          required: false
+          description: Filter by operation type
+          schema:
+            type: string
+            enum: [INSERT, UPDATE, DELETE]
       responses:
         '200':
           description: List of audit entries
@@ -255,6 +392,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AuditResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — ADMIN role required
 
   /v1/audit/student/{studentId}:
     get:
@@ -262,12 +403,7 @@ paths:
       summary: Get audit entries by student
       operationId: getAuditEntriesByStudent
       parameters:
-        - name: studentId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - $ref: '#/components/parameters/StudentIdPath'
       responses:
         '200':
           description: List of audit entries for the student
@@ -277,11 +413,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AuditResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — ADMIN role required
+        '404':
+          description: Student not found
 
   /v1/audit/stats:
     get:
       tags: [Audit]
-      summary: Get audit statistics
+      summary: Get audit statistics (count per operation type)
       operationId: getAuditStats
       responses:
         '200':
@@ -290,9 +432,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditStatsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — ADMIN role required
 
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 1
+
+    StudentIdPath:
+      name: studentId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 1
+
+    SubjectIdPath:
+      name: subjectId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 2
+
   schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          maxLength: 50
+          example: user1
+        password:
+          type: string
+          example: user123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9...
+        username:
+          type: string
+          example: user1
+        role:
+          type: string
+          enum: [ADMIN, USER]
+          example: USER
+
     StudentRequest:
       type: object
       required: [fullName]
@@ -316,6 +523,35 @@ components:
           type: number
           format: double
           example: 15.5
+
+    SubjectRequest:
+      type: object
+      required: [label, coefficient]
+      properties:
+        label:
+          type: string
+          maxLength: 100
+          example: Mathematics
+        coefficient:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 3.0
+
+    SubjectResponse:
+      type: object
+      properties:
+        subjectId:
+          type: integer
+          format: int32
+          example: 2
+        label:
+          type: string
+          example: Mathematics
+        coefficient:
+          type: number
+          format: double
+          example: 3.0
 
     GradeRequest:
       type: object
@@ -367,6 +603,7 @@ components:
           example: 42
         operationType:
           type: string
+          enum: [INSERT, UPDATE, DELETE]
           example: UPDATE
         updatedAt:
           type: string
@@ -392,7 +629,7 @@ components:
           example: 14.0
         dbUser:
           type: string
-          example: postgres
+          example: user1
 
     AuditStatsResponse:
       type: object

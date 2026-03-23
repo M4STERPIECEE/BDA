@@ -11,6 +11,7 @@ import com.bda.bda.model.Subject;
 import com.bda.bda.repository.GradeRepository;
 import com.bda.bda.repository.StudentRepository;
 import com.bda.bda.repository.SubjectRepository;
+import com.bda.bda.security.DbUserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GradeService {
-    private final GradeRepository gradeRepository;
-    private final StudentRepository studentRepository;
-    private final SubjectRepository subjectRepository;
+
+    private final GradeRepository    gradeRepository;
+    private final StudentRepository  studentRepository;
+    private final SubjectRepository  subjectRepository;
+    private final DbUserContext      dbUserContext;
 
     public List<GradeResponse> findAll() {
-        return gradeRepository.findAllWithDetails()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        return gradeRepository.findAllWithDetails().stream().map(this::toResponse).toList();
     }
 
     public List<GradeResponse> findByStudent(Integer studentId) {
@@ -44,12 +44,12 @@ public class GradeService {
 
     @Transactional
     public GradeResponse create(GradeRequest request) {
+        dbUserContext.propagate();
         Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + request.studentId()));
         Subject subject = subjectRepository.findById(request.subjectId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + request.subjectId()));
         GradeId id = new GradeId(student.getStudentId(), subject.getSubjectId());
         if (gradeRepository.existsById(id)) {
-            throw new GradeAlreadyExistsException("Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update."
-            );
+            throw new GradeAlreadyExistsException("Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update.");
         }
 
         Grade grade = Grade.builder().id(id).student(student).subject(subject).value(request.value()).build();
@@ -58,6 +58,7 @@ public class GradeService {
 
     @Transactional
     public GradeResponse update(Integer studentId, Integer subjectId, GradeRequest request) {
+        dbUserContext.propagate();
         Grade grade = getOrThrow(studentId, subjectId);
         grade.setValue(request.value());
         return toResponse(gradeRepository.save(grade));
@@ -65,6 +66,7 @@ public class GradeService {
 
     @Transactional
     public void delete(Integer studentId, Integer subjectId) {
+        dbUserContext.propagate();
         gradeRepository.delete(getOrThrow(studentId, subjectId));
     }
     private Grade getOrThrow(Integer studentId, Integer subjectId) {

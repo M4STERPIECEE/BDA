@@ -18,7 +18,7 @@ CREATE TABLE grade (
 );
 CREATE TABLE grade_audit (
                              audit_id        SERIAL PRIMARY KEY,
-                             operation_type  VARCHAR(10)  NOT NULL CHECK (operation_type IN ('INSERT', 'UPDATE', 'DELETE')),
+                             operation_type  VARCHAR(10)  NOT NULL CHECK (operation_type IN ('INSERT','UPDATE','DELETE')),
                              updated_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
                              student_id      INTEGER,
                              student_name    VARCHAR(100),
@@ -26,4 +26,13 @@ CREATE TABLE grade_audit (
                              old_value       NUMERIC(4,2),
                              new_value       NUMERIC(4,2),
                              db_user         VARCHAR(100) NOT NULL DEFAULT CURRENT_USER
+);
+
+CREATE TABLE app_user (
+                          user_id     SERIAL PRIMARY KEY,
+                          username    VARCHAR(50)  NOT NULL UNIQUE,
+                          password    VARCHAR(255) NOT NULL,          -- BCrypt hash
+                          role        VARCHAR(20)  NOT NULL DEFAULT 'USER'
+                              CHECK (role IN ('ADMIN','USER')),
+                          enabled     BOOLEAN      NOT NULL DEFAULT TRUE
 );
