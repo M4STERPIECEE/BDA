@@ -21,17 +21,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GradeService {
+
     private final GradeRepository gradeRepository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
 
     public List<GradeResponse> findAll() {
-        return gradeRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+        return gradeRepository.findAllWithDetails()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     public List<GradeResponse> findByStudent(Integer studentId) {
-        return gradeRepository.findAll().stream()
-                .filter(grade -> grade.getId() != null && studentId.equals(grade.getId().getStudentId()))
+        return gradeRepository.findAllByStudentId(studentId)
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -42,14 +46,27 @@ public class GradeService {
 
     @Transactional
     public GradeResponse create(GradeRequest request) {
-        Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with: " + request.studentId()));
-        Subject subject = subjectRepository.findById(request.subjectId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found with: " + request.subjectId()));
+        Student student = studentRepository.findById(request.studentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + request.studentId()));
+
+        Subject subject = subjectRepository.findById(request.subjectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + request.subjectId()));
+
         GradeId id = new GradeId(student.getStudentId(), subject.getSubjectId());
+
         if (gradeRepository.existsById(id)) {
-            throw new GradeAlreadyExistsException("Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update.");
+            throw new GradeAlreadyExistsException(
+                    "Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() +
+                            ". Use PUT to update.");
         }
 
-        Grade grade = Grade.builder().id(id).student(student).subject(subject).value(request.value()).build();
+        Grade grade = Grade.builder()
+                .id(id)
+                .student(student)
+                .subject(subject)
+                .value(request.value())
+                .build();
+
         return toResponse(gradeRepository.save(grade));
     }
 
@@ -69,15 +86,16 @@ public class GradeService {
     private Grade getOrThrow(Integer studentId, Integer subjectId) {
         GradeId id = new GradeId(studentId, subjectId);
         return gradeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Grade not found for student " + studentId + " and subject " + subjectId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Grade not found for student " + studentId + " and subject " + subjectId));
     }
 
-    public GradeResponse toResponse(Grade grade) {
+    private GradeResponse toResponse(Grade grade) {
         return new GradeResponse(
-                grade.getStudent() != null ? grade.getStudent().getStudentId() : grade.getId().getStudentId(),
-                grade.getStudent() != null ? grade.getStudent().getFullName() : null,
-                grade.getSubject() != null ? grade.getSubject().getSubjectId() : grade.getId().getSubjectId(),
-                grade.getSubject() != null ? grade.getSubject().getLabel() : null,
+                grade.getStudent().getStudentId(),
+                grade.getStudent().getFullName(),
+                grade.getSubject().getSubjectId(),
+                grade.getSubject().getLabel(),
                 grade.getValue()
         );
     }
