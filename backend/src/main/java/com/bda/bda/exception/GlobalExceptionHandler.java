@@ -26,9 +26,9 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
-    @ExceptionHandler(IllegalStateException.class)
+    @ExceptionHandler(GradeAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleConflict(
-            IllegalStateException ex, WebRequest request) {
+            GradeAlreadyExistsException ex, WebRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 

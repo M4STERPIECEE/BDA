@@ -2,6 +2,7 @@ package com.bda.bda.service;
 
 import com.bda.bda.dto.request.GradeRequest;
 import com.bda.bda.dto.response.GradeResponse;
+import com.bda.bda.exception.GradeAlreadyExistsException;
 import com.bda.bda.exception.ResourceNotFoundException;
 import com.bda.bda.model.Grade;
 import com.bda.bda.model.GradeId;
@@ -41,21 +42,21 @@ public class GradeService {
 
     @Transactional
     public GradeResponse create(GradeRequest request) {
-        Student student = studentRepository.findById(request.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with: " + request.getStudentId()));
-        Subject subject = subjectRepository.findById(request.getSubjectId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found with: " + request.getSubjectId()));
+        Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with: " + request.studentId()));
+        Subject subject = subjectRepository.findById(request.subjectId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found with: " + request.subjectId()));
         GradeId id = new GradeId(student.getStudentId(), subject.getSubjectId());
         if (gradeRepository.existsById(id)) {
-            throw new IllegalStateException("Grade already exists for student " + request.getStudentId() + " and subject " + request.getSubjectId() + ". Use PUT to update.");
+            throw new GradeAlreadyExistsException("Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update.");
         }
 
-        Grade grade = Grade.builder().id(id).student(student).subject(subject).value(request.getValue()).build();
+        Grade grade = Grade.builder().id(id).student(student).subject(subject).value(request.value()).build();
         return toResponse(gradeRepository.save(grade));
     }
 
     @Transactional
     public GradeResponse update(Integer studentId, Integer subjectId, GradeRequest request) {
         Grade grade = getOrThrow(studentId, subjectId);
-        grade.setValue(request.getValue());
+        grade.setValue(request.value());
         return toResponse(gradeRepository.save(grade));
     }
 
@@ -72,6 +73,12 @@ public class GradeService {
     }
 
     public GradeResponse toResponse(Grade grade) {
-        return GradeResponse.builder().studentId(grade.getStudent() != null ? grade.getStudent().getStudentId() : grade.getId().getStudentId()).studentName(grade.getStudent() != null ? grade.getStudent().getFullName() : null).subjectId(grade.getSubject() != null ? grade.getSubject().getSubjectId() : grade.getId().getSubjectId()).subjectLabel(grade.getSubject() != null ? grade.getSubject().getLabel() : null).value(grade.getValue()).build();
+        return new GradeResponse(
+                grade.getStudent() != null ? grade.getStudent().getStudentId() : grade.getId().getStudentId(),
+                grade.getStudent() != null ? grade.getStudent().getFullName() : null,
+                grade.getSubject() != null ? grade.getSubject().getSubjectId() : grade.getId().getSubjectId(),
+                grade.getSubject() != null ? grade.getSubject().getLabel() : null,
+                grade.getValue()
+        );
     }
 }

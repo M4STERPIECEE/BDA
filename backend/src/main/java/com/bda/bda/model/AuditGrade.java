@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AuditGrade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "audit_id")
+    @EqualsAndHashCode.Include
     private Integer auditId;
 
     @Column(name = "operation_type", nullable = false, length = 10)

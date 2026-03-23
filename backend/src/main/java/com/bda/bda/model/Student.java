@@ -9,11 +9,13 @@ import java.math.BigDecimal;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "student_id")
+    @EqualsAndHashCode.Include
     private Integer studentId;
 
     @Column(name = "full_name", nullable = false, length = 100)

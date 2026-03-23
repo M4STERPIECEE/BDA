@@ -9,9 +9,11 @@ import java.math.BigDecimal;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Grade {
 
     @EmbeddedId
+    @EqualsAndHashCode.Include
     private GradeId id;
 
     @ManyToOne(fetch = FetchType.LAZY)

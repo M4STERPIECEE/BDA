@@ -9,10 +9,12 @@ import java.math.BigDecimal;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Subject {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "subject_id")
+    @EqualsAndHashCode.Include
     private Integer subjectId;
 
     @Column(name = "label", nullable = false, length = 100)

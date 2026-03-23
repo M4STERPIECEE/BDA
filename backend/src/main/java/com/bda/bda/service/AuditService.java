@@ -31,10 +31,20 @@ public class AuditService {
         long inserts = auditGradeRepository.findAll().stream().filter(a -> "INSERT".equalsIgnoreCase(a.getOperationType())).count();
         long updates = auditGradeRepository.findAll().stream().filter(a -> "UPDATE".equalsIgnoreCase(a.getOperationType())).count();
         long deletes = auditGradeRepository.findAll().stream().filter(a -> "DELETE".equalsIgnoreCase(a.getOperationType())).count();
-        return AuditStatsResponse.builder().insertCount(inserts).updateCount(updates).deleteCount(deletes).totalCount(inserts + updates + deletes).build();
+        return new AuditStatsResponse(inserts, updates, deletes, inserts + updates + deletes);
     }
 
     private AuditResponse toResponse(AuditGrade audit) {
-        return AuditResponse.builder().auditId(audit.getAuditId()).operationType(audit.getOperationType()).updatedAt(audit.getUpdatedAt()).studentId(audit.getStudentId()).studentName(audit.getStudentName()).subjectLabel(audit.getSubjectLabel()).oldValue(audit.getOldValue()).newValue(audit.getNewValue()).dbUser(audit.getDbUser()).build();
+        return new AuditResponse(
+                audit.getAuditId(),
+                audit.getOperationType(),
+                audit.getUpdatedAt(),
+                audit.getStudentId(),
+                audit.getStudentName(),
+                audit.getSubjectLabel(),
+                audit.getOldValue(),
+                audit.getNewValue(),
+                audit.getDbUser()
+        );
     }
 }

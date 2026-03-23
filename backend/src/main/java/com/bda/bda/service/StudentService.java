@@ -28,7 +28,7 @@ public class StudentService {
     @Transactional
     public StudentResponse create(StudentRequest request) {
         Student student = Student.builder()
-                .fullName(request.getFullName())
+                .fullName(request.fullName())
                 .build();
         return toResponse(studentRepository.save(student));
     }
@@ -36,7 +36,7 @@ public class StudentService {
     @Transactional
     public StudentResponse update(Integer id, StudentRequest request) {
         Student student = getOrThrow(id);
-        student.setFullName(request.getFullName());
+        student.setFullName(request.fullName());
         return toResponse(studentRepository.save(student));
     }
 
@@ -52,6 +52,6 @@ public class StudentService {
     }
 
     public StudentResponse toResponse(Student s) {
-        return StudentResponse.builder().studentId(s.getStudentId()).fullName(s.getFullName()).average(s.getAverage()).build();
+        return new StudentResponse(s.getStudentId(), s.getFullName(), s.getAverage());
     }
 }
