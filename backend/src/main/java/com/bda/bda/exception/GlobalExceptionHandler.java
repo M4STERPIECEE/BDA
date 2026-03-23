@@ -27,19 +27,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(GradeAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleConflict(
+    public ResponseEntity<Map<String, Object>> handleGradeConflict(
             GradeAlreadyExistsException ex, WebRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(StudentAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleStudentConflict(
+            StudentAlreadyExistsException ex, WebRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(
             MethodArgumentNotValidException ex, WebRequest request) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());

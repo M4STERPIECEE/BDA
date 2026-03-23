@@ -2,35 +2,38 @@ package com.bda.bda.service;
 
 import com.bda.bda.dto.response.AuditResponse;
 import com.bda.bda.dto.response.AuditStatsResponse;
+import com.bda.bda.exception.ResourceNotFoundException;
 import com.bda.bda.model.AuditGrade;
 import com.bda.bda.repository.AuditGradeRepository;
+import com.bda.bda.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuditService {
+
     private final AuditGradeRepository auditGradeRepository;
+    private final StudentRepository studentRepository;
 
     public List<AuditResponse> findAll() {
-        return auditGradeRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+        return auditGradeRepository.findAllByOrderByUpdatedAtDesc().stream().map(this::toResponse).toList();
     }
 
     public List<AuditResponse> findByStudent(Integer studentId) {
-        return auditGradeRepository.findAll().stream()
-                .filter(audit -> audit.getStudentId() != null && studentId.equals(audit.getStudentId()))
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        if (!studentRepository.existsById(studentId)) {
+            throw new ResourceNotFoundException("Student not found with id: " + studentId);
+        }
+        return auditGradeRepository.findByStudentIdOrderByUpdatedAtDesc(studentId).stream().map(this::toResponse).toList();
     }
 
     public AuditStatsResponse getStats() {
-        long inserts = auditGradeRepository.findAll().stream().filter(a -> "INSERT".equalsIgnoreCase(a.getOperationType())).count();
-        long updates = auditGradeRepository.findAll().stream().filter(a -> "UPDATE".equalsIgnoreCase(a.getOperationType())).count();
-        long deletes = auditGradeRepository.findAll().stream().filter(a -> "DELETE".equalsIgnoreCase(a.getOperationType())).count();
+        long inserts = auditGradeRepository.countByOperationType("INSERT");
+        long updates = auditGradeRepository.countByOperationType("UPDATE");
+        long deletes = auditGradeRepository.countByOperationType("DELETE");
         return new AuditStatsResponse(inserts, updates, deletes, inserts + updates + deletes);
     }
 
