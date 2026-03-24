@@ -3,6 +3,7 @@ package com.bda.bda.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +65,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleMalformedJson(
             HttpMessageNotReadableException ex, WebRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request body", request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthentication(
+            AuthenticationException ex, WebRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password", request);
     }
 
     @ExceptionHandler(Exception.class)
