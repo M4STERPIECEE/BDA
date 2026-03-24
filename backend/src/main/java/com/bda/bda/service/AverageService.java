@@ -4,12 +4,27 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AverageService {
-    public double average(double... grades) {
-        if (grades == null || grades.length == 0) return 0d;
-        double sum = 0d;
-        for (double grade : grades) {
-            sum += grade;
+
+    public double average(double[] grades, double[] coefficients) {
+        if (grades == null || coefficients == null || grades.length == 0 || coefficients.length == 0) {
+            return 0d;
         }
-        return sum / grades.length;
+        if (grades.length != coefficients.length) {
+            throw new IllegalArgumentException("Grades and coefficients must have the same length");
+        }
+
+        double weightedSum = 0d;
+        double coefficientSum = 0d;
+
+        for (int i = 0; i < grades.length; i++) {
+            double coefficient = coefficients[i];
+            if (coefficient <= 0d) {
+                throw new IllegalArgumentException("Coefficient must be greater than 0");
+            }
+            weightedSum += grades[i] * coefficient;
+            coefficientSum += coefficient;
+        }
+
+        return coefficientSum == 0d ? 0d : weightedSum / coefficientSum;
     }
 }
