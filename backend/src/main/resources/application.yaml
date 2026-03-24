@@ -2,6 +2,9 @@ spring:
   application:
     name: bda
 
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
+
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bda}
     username: ${DB_USER:masterpiece}
@@ -29,7 +32,8 @@ version:
   path: v1
 
 jwt:
-  secret: ${JWT_SECRET}
+  # Environment value is preferred; fallback is dev-only.
+  secret: ${JWT_SECRET:dev-only-change-me-dev-only-change-me-dev-only-change-me-32-bytes-min}
   expiration-ms: 86400000
 
 springdoc:
