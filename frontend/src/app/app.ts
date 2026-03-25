@@ -6,6 +6,6 @@ import { Component, signal } from '@angular/core';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
+export class AppComponent {
   protected readonly title = signal('frontend');
 }
