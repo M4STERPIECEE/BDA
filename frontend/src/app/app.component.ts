@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -6,7 +6,4 @@ import { Component, signal } from '@angular/core';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class AppComponent {
-  protected readonly title = signal('frontend');
-}
-
+export class AppComponent {}

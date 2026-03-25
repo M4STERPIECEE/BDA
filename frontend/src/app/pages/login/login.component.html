@@ -1,0 +1,51 @@
+<div class="login-page">
+  <main class="login-main">
+    <div class="brand-header">
+      <div class="brand-icon-box">
+        <span class="material-symbols-outlined brand-icon">history_edu</span>
+      </div>
+      <h1>Se connecter a BDA Notes</h1>
+    </div>
+    <section class="glass-panel login-card">
+      @if (showError) {
+        <div class="error-box" role="alert">
+          <span class="material-symbols-outlined">error</span>
+          <p>Identifiants incorrects. Veuillez reessayer.</p>
+        </div>
+      }
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+        <div class="field-block">
+          <label for="username">Nom d'utilisateur</label>
+          <input id="username" type="text" formControlName="username" placeholder="votre.nom" class="input-editorial"/>
+        </div>
+        <div class="field-block">
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" formControlName="password" placeholder="••••••••" class="input-editorial"/>
+        </div>
+        <button type="submit" class="primary-gradient-btn submit-btn">
+          @if (isLoading) {
+            <span class="material-symbols-outlined spin">progress_activity</span>
+          }
+          <span>Se connecter</span>
+        </button>
+      </form>
+      <div class="login-footer">
+        <button type="button" class="forgot-btn">Mot de passe oublie ?</button>
+        <div class="footer-divider"></div>
+        <p>Acces reserve au personnel administratif de l'institution.</p>
+      </div>
+    </section>
+    <div class="editorial-strip">
+      <span>Academic Editorial</span>
+      <div class="strip-dots">
+        <div class="dot-long"></div>
+        <div class="dot-short"></div>
+      </div>
+    </div>
+  </main>
+  <div class="bg-decoration" aria-hidden="true">
+    <div class="blob blob-top"></div>
+    <div class="blob blob-bottom"></div>
+  </div>
+</div>
+
