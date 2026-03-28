@@ -10,7 +10,7 @@
       @if (showError) {
         <div class="error-box" role="alert">
           <span class="material-symbols-outlined">error</span>
-          <p>Identifiants incorrects. Veuillez reessayer.</p>
+          <p>{{ errorMessage }}</p>
         </div>
       }
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
@@ -22,7 +22,17 @@
           <label for="password">Mot de passe</label>
           <input id="password" type="password" formControlName="password" placeholder="••••••••" class="input-editorial"/>
         </div>
-        <button type="submit" class="primary-gradient-btn submit-btn">
+        <div class="field-block">
+          <label for="role">Role</label>
+          <select id="role" formControlName="role" class="input-editorial">
+            <option value="ETUDIANT">Etudiant</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+        </div>
+        <button type="submit" class="primary-gradient-btn submit-btn" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="material-symbols-outlined spin">progress_activity</span>
+          }
           <span>Se connecter</span>
         </button>
       </form>
@@ -32,17 +42,6 @@
         <p>Acces reserve au personnel administratif de l'institution.</p>
       </div>
     </section>
-    <div class="editorial-strip">
-      <span>Academic Editorial</span>
-      <div class="strip-dots">
-        <div class="dot-long"></div>
-        <div class="dot-short"></div>
-      </div>
-    </div>
   </main>
-  <div class="bg-decoration" aria-hidden="true">
-    <div class="blob blob-top"></div>
-    <div class="blob blob-bottom"></div>
-  </div>
 </div>
 
