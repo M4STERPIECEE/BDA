@@ -3,7 +3,6 @@ package com.bda.bda.controller.v1;
 import com.bda.bda.dto.request.LoginRequest;
 import com.bda.bda.dto.response.AuthResponse;
 import com.bda.bda.security.JwtUtils;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,15 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Auth")
 public class AuthController {
-
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
     @PostMapping("/login")
-    @Operation(summary = "Authenticate and get JWT token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Authentication successful",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Authentication successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
             @ApiResponse(responseCode = "401", description = "Invalid username or password")
     })
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -56,7 +52,6 @@ public class AuthController {
         if (!role.equals(requestedRole)) {
             throw new BadCredentialsException("Invalid username, password, or role");
         }
-
         String token = jwtUtils.generateToken(userDetails);
         return ResponseEntity.ok(new AuthResponse(token, userDetails.getUsername(), role));
     }

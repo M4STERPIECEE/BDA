@@ -21,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GradeService {
-
     private final GradeRepository    gradeRepository;
     private final StudentRepository  studentRepository;
     private final SubjectRepository  subjectRepository;
@@ -33,7 +32,7 @@ public class GradeService {
 
     public List<GradeResponse> findByStudent(Integer studentId) {
         if (!studentRepository.existsById(studentId)) {
-            throw new ResourceNotFoundException("Student not found with id: " + studentId);
+            throw new ResourceNotFoundException("student not found with id: " + studentId);
         }
         return gradeRepository.findAllByStudentId(studentId).stream().map(this::toResponse).toList();
     }
@@ -45,11 +44,11 @@ public class GradeService {
     @Transactional
     public GradeResponse create(GradeRequest request) {
         dbUserContext.propagate();
-        Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + request.studentId()));
-        Subject subject = subjectRepository.findById(request.subjectId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + request.subjectId()));
+        Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("student not found with id: " + request.studentId()));
+        Subject subject = subjectRepository.findById(request.subjectId()).orElseThrow(() -> new ResourceNotFoundException("subject not found with id: " + request.subjectId()));
         GradeId id = new GradeId(student.getStudentId(), subject.getSubjectId());
         if (gradeRepository.existsById(id)) {
-            throw new GradeAlreadyExistsException("Grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update.");
+            throw new GradeAlreadyExistsException("grade already exists for student " + request.studentId() + " and subject " + request.subjectId() + ". Use PUT to update");
         }
 
         Grade grade = Grade.builder().id(id).student(student).subject(subject).value(request.value()).build();
@@ -75,12 +74,7 @@ public class GradeService {
 
 
     private GradeResponse toResponse(Grade grade) {
-        return new GradeResponse(
-                grade.getStudent().getStudentId(),
-                grade.getStudent().getFullName(),
-                grade.getSubject().getSubjectId(),
-                grade.getSubject().getLabel(),
-                grade.getValue()
+        return new GradeResponse(grade.getStudent().getStudentId(), grade.getStudent().getFullName(), grade.getSubject().getSubjectId(), grade.getSubject().getLabel(), grade.getValue()
         );
     }
 }

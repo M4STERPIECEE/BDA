@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:16-alpine
     container_name: bda-db
@@ -7,10 +6,11 @@ services:
     environment:
       POSTGRES_DB:       ${DB_NAME}
       POSTGRES_USER:     ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
     volumes:
       - pgdata:/var/lib/postgresql/data
-
     ports:
       - "5432:5432"
     healthcheck:
@@ -33,10 +33,17 @@ services:
       DB_PORT:    5432
       DB_NAME:    ${DB_NAME}
       DB_USER:    ${DB_USER}
-      DB_PASS:    ${DB_PASS}
-      JWT_SECRET: ${JWT_SECRET}
+    secrets:
+      - db_password
+      - jwt_secret
     ports:
       - "8080:8080"
 
 volumes:
   pgdata:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt

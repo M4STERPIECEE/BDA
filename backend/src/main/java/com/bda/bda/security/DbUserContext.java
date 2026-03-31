@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DbUserContext {
-
     private final EntityManager entityManager;
 
     public void propagate() {

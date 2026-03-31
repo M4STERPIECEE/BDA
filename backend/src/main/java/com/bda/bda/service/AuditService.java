@@ -20,8 +20,7 @@ public class AuditService {
     private final StudentRepository    studentRepository;
 
     public List<AuditResponse> findAll() {
-        return auditGradeRepository.findAllByOrderByUpdatedAtDesc()
-                .stream().map(this::toResponse).toList();
+        return auditGradeRepository.findAllByOrderByUpdatedAtDesc().stream().map(this::toResponse).toList();
     }
 
     public List<AuditResponse> findByType(String operationType) {
@@ -30,7 +29,7 @@ public class AuditService {
 
     public List<AuditResponse> findByStudent(Integer studentId) {
         if (!studentRepository.existsById(studentId)) {
-            throw new ResourceNotFoundException("Student not found with id: " + studentId);
+            throw new ResourceNotFoundException("student not found with id: " + studentId);
         }
         return auditGradeRepository.findByStudentIdOrderByUpdatedAtDesc(studentId).stream().map(this::toResponse).toList();
     }

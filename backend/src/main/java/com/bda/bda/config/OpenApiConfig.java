@@ -14,15 +14,10 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI()
-                .servers(List.of(new Server().url("/api")))
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .components(new Components().addSecuritySchemes("bearerAuth",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")))
-                .info(new Info().title("BDA — API").description("REST API").version("v1")
-                        .contact(new Contact().name("BDA School").email("bda@ecole.mg")));
+        return new OpenAPI().servers(List.of(new Server().url("/api"))).addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+               .components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme().type(SecurityScheme.Type.HTTP)
+               .scheme("bearer").bearerFormat("JWT")))
+               .info(new Info().title("API").description("REST API")
+               .version("v1").contact(new Contact().name("BDA School").email("michaelramana2021@gmail.com")));
     }
 }

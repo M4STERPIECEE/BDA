@@ -30,7 +30,7 @@ public class StudentService {
     public StudentResponse create(StudentRequest request) {
         if (studentRepository.existsByFullNameIgnoreCase(request.fullName())) {
             throw new StudentAlreadyExistsException(
-                    "Student already exists with name: " + request.fullName()
+                    "student already exists with name: " + request.fullName()
             );
         }
         Student student = Student.builder()
@@ -45,7 +45,7 @@ public class StudentService {
         if (!student.getFullName().equalsIgnoreCase(request.fullName())
                 && studentRepository.existsByFullNameIgnoreCase(request.fullName())) {
             throw new StudentAlreadyExistsException(
-                    "Another student already exists with name: " + request.fullName()
+                    "another student already exists with name: " + request.fullName()
             );
         }
         student.setFullName(request.fullName());
@@ -58,8 +58,7 @@ public class StudentService {
     }
 
     private Student getOrThrow(Integer id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+        return studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("student not found with id: " + id));
     }
 
     private StudentResponse toResponse(Student s) {

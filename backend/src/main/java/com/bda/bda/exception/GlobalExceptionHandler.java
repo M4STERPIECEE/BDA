@@ -16,43 +16,33 @@ import java.util.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(
-            ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex, WebRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(GradeInvalidException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidGrade(
-            GradeInvalidException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleInvalidGrade(GradeInvalidException ex, WebRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     @ExceptionHandler(GradeAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleGradeConflict(
-            GradeAlreadyExistsException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleGradeConflict(GradeAlreadyExistsException ex, WebRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(StudentAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleStudentConflict(
-            StudentAlreadyExistsException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleStudentConflict(StudentAlreadyExistsException ex, WebRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(SubjectAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleSubjectConflict(
-            SubjectAlreadyExistsException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleSubjectConflict(SubjectAlreadyExistsException ex, WebRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(
-            MethodArgumentNotValidException ex, WebRequest request) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
@@ -62,26 +52,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, Object>> handleMalformedJson(
-            HttpMessageNotReadableException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleMalformedJson(HttpMessageNotReadableException ex, WebRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request body", request);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Map<String, Object>> handleAuthentication(
-            AuthenticationException ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex, WebRequest request) {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password", request);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(
-            Exception ex, WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex, WebRequest request) {
         log.error("Unexpected error", ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
     }
 
-    private ResponseEntity<Map<String, Object>> buildResponse(
-            HttpStatus status, String message, WebRequest request) {
+    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());

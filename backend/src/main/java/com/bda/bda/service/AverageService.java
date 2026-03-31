@@ -10,7 +10,7 @@ public class AverageService {
             return 0d;
         }
         if (grades.length != coefficients.length) {
-            throw new IllegalArgumentException("Grades and coefficients must have the same length");
+            throw new IllegalArgumentException("grades and coefficients must have the same length");
         }
 
         double weightedSum = 0d;
@@ -19,7 +19,7 @@ public class AverageService {
         for (int i = 0; i < grades.length; i++) {
             double coefficient = coefficients[i];
             if (coefficient <= 0d) {
-                throw new IllegalArgumentException("Coefficient must be greater than 0");
+                throw new IllegalArgumentException("coefficient must be greater than 0");
             }
             weightedSum += grades[i] * coefficient;
             coefficientSum += coefficient;
