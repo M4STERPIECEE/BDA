@@ -1,24 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-/* ═══════════════════════════════════════
-   Host & Page shell
-═══════════════════════════════════════ */
 :host {
   display: block;
   font-family: 'Outfit', sans-serif;
 }
 
 .students-page {
-  min-height: 100%;
+  min-height: 100vh;
   background: #f4f3fb;
   background-image:
     radial-gradient(ellipse 60% 40% at 80% -10%, rgba(99, 91, 255, 0.08) 0%, transparent 60%),
     radial-gradient(ellipse 40% 30% at 5%  90%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
 }
 
-/* ═══════════════════════════════════════
-   Breadcrumb & Header
-═══════════════════════════════════════ */
 .breadcrumb { color: #9694b4; letter-spacing: 0.1em; }
 .crumb-muted { opacity: 0.55; }
 .crumb-sep   { opacity: 0.35; margin: 0 2px; }
@@ -40,9 +34,6 @@
   max-width: 480px;
 }
 
-/* ═══════════════════════════════════════
-   Primary Button
-═══════════════════════════════════════ */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -398,14 +389,11 @@
   box-shadow: 0 0 0 3px rgba(91, 81, 248, 0.1);
   background: #fff;
 }
-
-/* ── Wrapper ── */
 .table-wrapper {
-  max-height: 58vh;
-  overflow: auto;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: visible;
 }
-
-/* ── Table ── */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -427,7 +415,6 @@
   white-space: nowrap;
 }
 
-/* ── Rows ── */
 .data-row {
   border-bottom: 1px solid #f4f3fb;
   animation: rowFadeIn 0.3s ease both;
@@ -446,7 +433,6 @@
   vertical-align: middle;
 }
 
-/* Student ID */
 .student-id {
   font-family: 'DM Mono', monospace;
   font-size: 0.8rem;
@@ -458,7 +444,6 @@
   white-space: nowrap;
 }
 
-/* Name cell */
 .student-name-cell {
   display: flex;
   align-items: center;
@@ -486,7 +471,6 @@
   font-size: 0.9rem;
 }
 
-/* Average badge */
 .avg-badge {
   display: inline-flex;
   align-items: center;
@@ -508,7 +492,6 @@
   border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
-/* ── Action buttons ── */
 .row-actions {
   display: flex;
   align-items: center;
@@ -543,7 +526,6 @@
 .action-delete { color: #c0b9c8; }
 .action-delete:hover { background: #fff1f1; color: #dc2626; }
 
-/* ── Loading / Error states ── */
 .table-state {
   display: flex;
   flex-direction: column;
@@ -556,7 +538,6 @@
 .table-error { color: #dc2626; }
 .table-error .material-symbols-outlined { font-size: 2rem; opacity: 0.6; }
 
-/* Loader dots */
 .loader-dots {
   display: flex;
   gap: 6px;
@@ -575,8 +556,6 @@
   0%, 100% { transform: translateY(0); opacity: 0.4; }
   50%       { transform: translateY(-8px); opacity: 1; }
 }
-
-/* ── Footer / Pagination ── */
 .table-footer {
   display: flex;
   align-items: center;
@@ -628,7 +607,6 @@
 }
 .page-btn .material-symbols-outlined { font-size: 1.1rem; }
 
-/* ── Responsive ── */
 @media (max-width: 640px) {
   .students-page { padding: 1.25rem 1rem 3rem; }
   .page-title    { font-size: 1.7rem; }
