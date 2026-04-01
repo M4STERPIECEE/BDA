@@ -31,8 +31,12 @@ public class StudentController {
     @GetMapping
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Students returned", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentResponse.class))))
     })
-    public ResponseEntity<Page<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page) {
-        return ResponseEntity.ok(studentService.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "studentId"))));
+    public ResponseEntity<Page<StudentResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        int effectiveSize = size > 0 ? size : PAGE_SIZE;
+        return ResponseEntity.ok(studentService.findAll(PageRequest.of(page, effectiveSize, Sort.by(Sort.Direction.DESC, "studentId"))));
     }
 
     @GetMapping("/stats")

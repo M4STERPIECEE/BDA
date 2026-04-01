@@ -1,7 +1,7 @@
 <div class="relative min-h-screen bg-[#faf8ff]">
   <app-etudiant-sidebar (logoutRequested)="logout()"></app-etudiant-sidebar>
   <app-etudiant-topbar></app-etudiant-topbar>
-  <section class="ml-64 mt-16 overflow-x-hidden">
+  <section class="ml-64 mt-16 h-[calc(100vh-4rem)] overflow-x-hidden overflow-y-auto">
     <router-outlet></router-outlet>
   </section>
 </div>

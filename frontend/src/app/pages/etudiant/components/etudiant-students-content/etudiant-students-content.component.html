@@ -48,14 +48,14 @@
         <tbody *ngIf="!loading && !errorMessage">
           <tr *ngFor="let student of students; let i = index" class="data-row" [style.animation-delay]="i * 40 + 'ms'">
             <td>
-              <span class="student-id">#{{ student.studentId }}</span>
+              <span class="student-id">{{ student.studentCode || ('#' + student.studentId) }}</span>
             </td>
             <td>
               <div class="student-name-cell">
                 <span class="student-name">{{ student.fullName }}</span>
               </div>
             </td>
-            <td>
+            <td class="text-center">
               <span class="avg-badge" [class.avg-good]="student.average >= 10" [class.avg-bad]="student.average < 10">
                 {{ formatAverage(student.average) }}
               </span>
@@ -80,7 +80,7 @@
       <p>{{ errorMessage }}</p>
     </div>
     <div class="table-footer">
-      <p class="footer-count">{{ students.length }} étudiant(s) affiché(s) sur {{ statsTotalStudents }} au total</p>
+      <p class="footer-count">{{ students.length }} étudiant(s) affiché(s) sur {{ displayedTotalStudents }} au total</p>
       <div class="pagination">
         <button class="page-btn" type="button" (click)="loadPage(currentPage - 1)" [disabled]="currentPage === 0">
           <span class="material-symbols-outlined">chevron_left</span>

@@ -40,7 +40,7 @@ interface StudentStatsResponse {
   styleUrl: './etudiant-students-content.component.css',
 })
 export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
-  private readonly studentsCacheKey = 'bda_students_cache_v1';
+  private readonly studentsCacheKey = 'bda_students_cache_v2';
   private readonly pageSize = 5;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -61,7 +61,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   readonly tableHeaders: TableHeader[] = [
     { label: 'ID étudiant' },
     { label: 'Nom complet' },
-    { label: 'Moyenne (/20)' },
+    { label: 'Moyenne (/20)', className: 'text-center' },
     { label: 'Actions', className: 'text-right' },
   ];
 
@@ -176,14 +176,19 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   }
 
   get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, index) => index);
+    const visiblePageCount = this.totalPages > 0 ? this.totalPages : (this.students.length > 0 ? 1 : 0);
+    return Array.from({ length: visiblePageCount }, (_, index) => index);
+  }
+
+  get displayedTotalStudents(): number {
+    return Math.max(this.statsTotalStudents, this.students.length);
   }
 
   get kpiCards(): KpiCard[] {
     return [
       {
         label: 'Total Étudiants',
-        value: String(this.statsTotalStudents),
+        value: String(this.displayedTotalStudents),
         icon: 'groups',
         cardClass: 'kpi-card kpi-blue',
         iconClass: 'material-symbols-outlined',
@@ -223,12 +228,18 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     this.studentService.getStudents(page, this.pageSize).subscribe({
       next: (response) => {
         this.students = response.content;
-        this.currentPage = response.number;
-        this.totalPages = response.totalPages;
+        this.currentPage = Number.isInteger(response.number) ? response.number : page;
+        this.statsTotalStudents = Number(response.totalElements ?? response.content.length ?? 0);
+        const hasStudents = response.content.length > 0;
+        this.totalPages = Math.max(Number(response.totalPages ?? 0), hasStudents ? 1 : 0);
         this.writeStudentsCache(response.content);
         this.loading = false;
       },
       error: () => {
+        this.statsTotalStudents = Math.max(this.statsTotalStudents, this.students.length);
+        if (this.students.length > 0) {
+          this.totalPages = Math.max(this.totalPages, 1);
+        }
         if (this.students.length === 0) {
           this.errorMessage = 'Impossible de charger les etudiants.';
         }
@@ -240,12 +251,10 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   private loadStats(): void {
     this.studentService.getStudentStats().subscribe({
       next: (stats: StudentStatsResponse) => {
-        this.statsTotalStudents = Number(stats.totalStudents ?? 0);
         this.statsGlobalAverage = Number(stats.globalAverage ?? 0);
         this.statsStudentsInAlert = Number(stats.studentsInAlert ?? 0);
       },
       error: () => {
-        // Keep current values if stats endpoint is unavailable.
       },
     });
   }
@@ -290,6 +299,6 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     this.toastTimeoutId = setTimeout(() => {
       this.successToastMessage = '';
       this.toastTimeoutId = null;
-    }, 2600);
+    }, 1500);
   }
 }
