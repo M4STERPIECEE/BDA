@@ -180,11 +180,15 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     return Array.from({ length: visiblePageCount }, (_, index) => index);
   }
 
+  get displayedTotalStudents(): number {
+    return Math.max(this.statsTotalStudents, this.students.length);
+  }
+
   get kpiCards(): KpiCard[] {
     return [
       {
         label: 'Total Étudiants',
-        value: String(this.statsTotalStudents),
+        value: String(this.displayedTotalStudents),
         icon: 'groups',
         cardClass: 'kpi-card kpi-blue',
         iconClass: 'material-symbols-outlined',
@@ -225,12 +229,14 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.students = response.content;
         this.currentPage = Number.isInteger(response.number) ? response.number : page;
+        this.statsTotalStudents = Number(response.totalElements ?? response.content.length ?? 0);
         const hasStudents = response.content.length > 0;
         this.totalPages = Math.max(Number(response.totalPages ?? 0), hasStudents ? 1 : 0);
         this.writeStudentsCache(response.content);
         this.loading = false;
       },
       error: () => {
+        this.statsTotalStudents = Math.max(this.statsTotalStudents, this.students.length);
         if (this.students.length > 0) {
           this.totalPages = Math.max(this.totalPages, 1);
         }
@@ -245,12 +251,10 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   private loadStats(): void {
     this.studentService.getStudentStats().subscribe({
       next: (stats: StudentStatsResponse) => {
-        this.statsTotalStudents = Number(stats.totalStudents ?? 0);
         this.statsGlobalAverage = Number(stats.globalAverage ?? 0);
         this.statsStudentsInAlert = Number(stats.studentsInAlert ?? 0);
       },
       error: () => {
-        // Keep current values if stats endpoint is unavailable.
       },
     });
   }
@@ -295,6 +299,6 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     this.toastTimeoutId = setTimeout(() => {
       this.successToastMessage = '';
       this.toastTimeoutId = null;
-    }, 2600);
+    }, 1500);
   }
 }
