@@ -32,7 +32,7 @@
           <span class="material-symbols-outlined search-icon">search</span>
           <input class="search-input" placeholder="Rechercher un étudiant…" type="text" />
         </div>
-        <button class="btn-primary" type="button">
+        <button class="btn-primary" type="button" (click)="openCreateModal()">
           <span class="material-symbols-outlined">person_add</span>
           Nouveau étudiant
         </button>
@@ -93,4 +93,38 @@
       </div>
     </div>
   </section>
+  <div *ngIf="isCreateModalOpen" class="modal-backdrop" (click)="closeCreateModal()">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Ajouter un étudiant" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ajouter un étudiant</h3>
+        <button class="modal-close" type="button" (click)="closeCreateModal()" [disabled]="isSubmitting" aria-label="Fermer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form [formGroup]="studentForm" (ngSubmit)="submitCreateStudent()" class="modal-form">
+        <label for="fullName" class="modal-label">Nom complet</label>
+        <input id="fullName" class="modal-input" formControlName="fullName" type="text" placeholder="Ex: Jean Dupont" [class.modal-input-error]="studentForm.controls.fullName.invalid && studentForm.controls.fullName.touched"/>
+        <p *ngIf="studentForm.controls.fullName.hasError('required') && studentForm.controls.fullName.touched" class="modal-error">
+          Le nom complet est obligatoire.
+        </p>
+        <p *ngIf="studentForm.controls.fullName.hasError('maxlength') && studentForm.controls.fullName.touched" class="modal-error">
+          Le nom ne doit pas dépasser 100 caractères.
+        </p>
+        <p *ngIf="createErrorMessage" class="modal-error">{{ createErrorMessage }}</p>
+        <div class="modal-actions">
+          <button class="btn-secondary" type="button" (click)="closeCreateModal()" [disabled]="isSubmitting">Annuler</button>
+          <button class="btn-primary" type="submit" [disabled]="isSubmitting">
+            <span *ngIf="isSubmitting" class="btn-spinner" aria-hidden="true"></span>
+            <span *ngIf="!isSubmitting" class="material-symbols-outlined">save</span>
+            {{ isSubmitting ? 'Ajout...' : 'Ajouter' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="successToastMessage" class="toast-success" role="status" aria-live="polite">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span>{{ successToastMessage }}</span>
+  </div>
 </main>

@@ -66,6 +66,187 @@
 }
 .btn-primary .material-symbols-outlined { font-size: 1.15rem; }
 
+.btn-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #5b51f8;
+  background: #f0eeff;
+  border: 1px solid #ddd8ff;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #e7e3ff;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════
+   Create Student Modal
+═══════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(24, 23, 45, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-card {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(91, 81, 248, 0.15);
+  box-shadow: 0 24px 60px rgba(24, 23, 45, 0.25);
+  padding: 1.25rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #18172d;
+}
+
+.modal-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  background: #f4f3fb;
+  color: #6b6987;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: #eceaf8;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.modal-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7b7898;
+}
+
+.modal-input {
+  width: 100%;
+  border: 1.5px solid #e8e6f8;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.92rem;
+  color: #18172d;
+  background: #faf9ff;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: #5b51f8;
+  box-shadow: 0 0 0 3px rgba(91, 81, 248, 0.1);
+  background: #fff;
+}
+
+.modal-input-error {
+  border-color: #dc2626;
+  background: #fff7f7;
+}
+
+.modal-error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.modal-actions {
+  margin-top: 0.6rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.toast-success {
+  position: fixed;
+  right: 1.3rem;
+  bottom: 1.3rem;
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 12px;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  font-size: 0.86rem;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(24, 23, 45, 0.16);
+  animation: toastSlideIn 0.2s ease-out;
+}
+
+.toast-success .material-symbols-outlined {
+  font-size: 1.05rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ═══════════════════════════════════════
    KPI Cards  (contenu-style)
 ═══════════════════════════════════════ */

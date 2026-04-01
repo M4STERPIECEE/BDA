@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Student } from '../../../../models/student.model';
 import { StudentService } from '../../../../services/student.service';
 
@@ -30,10 +32,18 @@ interface RowAction {
   templateUrl: './etudiant-students-content.component.html',
   styleUrl: './etudiant-students-content.component.css',
 })
-export class EtudiantStudentsContentComponent implements OnInit {
+export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
+  private readonly studentsCacheKey = 'bda_students_cache_v1';
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   students: Student[] = [];
   loading = true;
   errorMessage = '';
+  isCreateModalOpen = false;
+  isSubmitting = false;
+  createErrorMessage = '';
+  successToastMessage = '';
+  readonly studentForm;
 
   readonly tableHeaders: TableHeader[] = [
     { label: 'ID étudiant' },
@@ -60,17 +70,105 @@ export class EtudiantStudentsContentComponent implements OnInit {
     },
   ];
 
-  constructor(private readonly studentService: StudentService) {}
+  constructor(
+    private readonly studentService: StudentService,
+    private readonly formBuilder: FormBuilder,
+  ) {
+    this.studentForm = this.formBuilder.nonNullable.group({
+      fullName: ['', [Validators.required, Validators.maxLength(100)]],
+    });
+  }
 
   ngOnInit(): void {
+    const cachedStudents = this.readStudentsCache();
+    if (cachedStudents.length > 0) {
+      this.students = cachedStudents;
+      this.loading = false;
+      this.loadStudents(false);
+      return;
+    }
+
+    this.loadStudents(true);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+  }
+
+  private loadStudents(showLoader: boolean): void {
+    this.loading = showLoader;
+    if (showLoader) {
+      this.errorMessage = '';
+    }
+
     this.studentService.getStudents().subscribe({
       next: (data: Student[]) => {
         this.students = data;
+        this.writeStudentsCache(data);
         this.loading = false;
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les etudiants.';
+        if (this.students.length === 0) {
+          this.errorMessage = 'Impossible de charger les etudiants.';
+        }
         this.loading = false;
+      },
+    });
+  }
+
+  openCreateModal(): void {
+    this.isCreateModalOpen = true;
+    this.createErrorMessage = '';
+    this.studentForm.reset({ fullName: '' });
+  }
+
+  closeCreateModal(): void {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.isCreateModalOpen = false;
+    this.createErrorMessage = '';
+    this.studentForm.reset({ fullName: '' });
+  }
+
+  submitCreateStudent(): void {
+    if (this.studentForm.invalid || this.isSubmitting) {
+      this.studentForm.markAllAsTouched();
+      return;
+    }
+
+    const fullName = this.studentForm.controls.fullName.value.trim();
+    if (!fullName) {
+      this.studentForm.controls.fullName.setErrors({ required: true });
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.createErrorMessage = '';
+
+    this.studentService.createStudent({ fullName }).subscribe({
+      next: (createdStudent: Student) => {
+        this.isSubmitting = false;
+        this.isCreateModalOpen = false;
+        this.studentForm.reset({ fullName: '' });
+
+        // Instant feedback in table, then silent sync with backend ordering/state.
+        this.students = [createdStudent, ...this.students];
+        this.writeStudentsCache(this.students);
+        this.showSuccessToast('Etudiant ajoute avec succes.');
+        this.loadStudents(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
+        if (error.status === 409) {
+          this.createErrorMessage = 'Cet etudiant existe deja.';
+          return;
+        }
+
+        this.createErrorMessage = "Impossible d'ajouter l'etudiant.";
       },
     });
   }
@@ -124,6 +222,49 @@ export class EtudiantStudentsContentComponent implements OnInit {
 
   formatAverage(value: number): string {
     return Number(value ?? 0).toFixed(2);
+  }
+
+  private readStudentsCache(): Student[] {
+    const rawCache = localStorage.getItem(this.studentsCacheKey);
+    if (!rawCache) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(rawCache) as { timestamp: number; students: Student[] };
+      const tenMinutesMs = 10 * 60 * 1000;
+      if (!parsed?.timestamp || Date.now() - parsed.timestamp > tenMinutesMs) {
+        localStorage.removeItem(this.studentsCacheKey);
+        return [];
+      }
+
+      return Array.isArray(parsed.students) ? parsed.students : [];
+    } catch {
+      localStorage.removeItem(this.studentsCacheKey);
+      return [];
+    }
+  }
+
+  private writeStudentsCache(students: Student[]): void {
+    localStorage.setItem(
+      this.studentsCacheKey,
+      JSON.stringify({
+        timestamp: Date.now(),
+        students,
+      }),
+    );
+  }
+
+  private showSuccessToast(message: string): void {
+    this.successToastMessage = message;
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+
+    this.toastTimeoutId = setTimeout(() => {
+      this.successToastMessage = '';
+      this.toastTimeoutId = null;
+    }, 2600);
   }
 }
 
