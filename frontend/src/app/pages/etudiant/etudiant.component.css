@@ -9,4 +9,7 @@
   font-family: "Poppins", sans-serif !important;
 }
 
-
+.route-transition-host {
+  position: relative;
+  min-height: 100%;
+}
