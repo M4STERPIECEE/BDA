@@ -2,6 +2,7 @@ package com.bda.bda.controller.v1;
 
 import com.bda.bda.dto.request.StudentRequest;
 import com.bda.bda.dto.response.StudentResponse;
+import com.bda.bda.dto.response.StudentStatsResponse;
 import com.bda.bda.service.StudentService;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,23 +12,34 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/${version.path}/students")
 @RequiredArgsConstructor
 @Tag(name = "Students")
 public class StudentController {
+    private static final int PAGE_SIZE = 5;
+
     private final StudentService studentService;
 
     @GetMapping
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Students returned", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentResponse.class))))
     })
-    public ResponseEntity<List<StudentResponse>> getAll() {
-        return ResponseEntity.ok(studentService.findAll());
+    public ResponseEntity<Page<StudentResponse>> getAll(@RequestParam(defaultValue = "0") int page) {
+        return ResponseEntity.ok(studentService.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "studentId"))));
+    }
+
+    @GetMapping("/stats")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Student stats returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentStatsResponse.class)))
+    })
+    public ResponseEntity<StudentStatsResponse> getStats() {
+        return ResponseEntity.ok(studentService.getStats());
     }
 
     @GetMapping("/{id}")

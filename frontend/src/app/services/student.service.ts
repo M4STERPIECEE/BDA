@@ -8,14 +8,36 @@ interface CreateStudentRequest {
   fullName: string;
 }
 
+interface PageResponse<T> {
+  content: T[];
+  number: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+interface StudentStatsResponse {
+  totalStudents: number;
+  globalAverage: number;
+  studentsInAlert: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class StudentService {
   private readonly apiUrl = API_ENDPOINTS.students.list;
+  private readonly statsUrl = `${API_ENDPOINTS.students.list}/stats`;
 
   constructor(private readonly http: HttpClient) {}
 
-  getStudents(): Observable<Student[]> {
-    return this.http.get<Student[]>(this.apiUrl, {
+  getStudents(page = 0, size = 5): Observable<PageResponse<Student>> {
+    return this.http.get<PageResponse<Student>>(this.apiUrl, {
+      params: { page: page.toString(), size: size.toString() },
+      headers: this.buildAuthHeaders(),
+    });
+  }
+
+  getStudentStats(): Observable<StudentStatsResponse> {
+    return this.http.get<StudentStatsResponse>(this.statsUrl, {
       headers: this.buildAuthHeaders(),
     });
   }

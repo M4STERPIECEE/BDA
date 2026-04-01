@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, Validators } from '@angular/forms';
+
 import { Student } from '../../../../models/student.model';
 import { StudentService } from '../../../../services/student.service';
 
@@ -26,6 +27,12 @@ interface RowAction {
   className: string;
 }
 
+interface StudentStatsResponse {
+  totalStudents: number;
+  globalAverage: number;
+  studentsInAlert: number;
+}
+
 @Component({
   selector: 'app-etudiant-students-content',
   standalone: false,
@@ -34,9 +41,15 @@ interface RowAction {
 })
 export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   private readonly studentsCacheKey = 'bda_students_cache_v1';
+  private readonly pageSize = 5;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   students: Student[] = [];
+  statsTotalStudents = 0;
+  statsGlobalAverage = 0;
+  statsStudentsInAlert = 0;
+  currentPage = 0;
+  totalPages = 0;
   loading = true;
   errorMessage = '';
   isCreateModalOpen = false;
@@ -84,38 +97,18 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     if (cachedStudents.length > 0) {
       this.students = cachedStudents;
       this.loading = false;
-      this.loadStudents(false);
-      return;
+      this.loadStudents(this.currentPage, false);
+    } else {
+      this.loadStudents(this.currentPage, true);
     }
 
-    this.loadStudents(true);
+    this.loadStats();
   }
 
   ngOnDestroy(): void {
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
     }
-  }
-
-  private loadStudents(showLoader: boolean): void {
-    this.loading = showLoader;
-    if (showLoader) {
-      this.errorMessage = '';
-    }
-
-    this.studentService.getStudents().subscribe({
-      next: (data: Student[]) => {
-        this.students = data;
-        this.writeStudentsCache(data);
-        this.loading = false;
-      },
-      error: () => {
-        if (this.students.length === 0) {
-          this.errorMessage = 'Impossible de charger les etudiants.';
-        }
-        this.loading = false;
-      },
-    });
   }
 
   openCreateModal(): void {
@@ -155,11 +148,12 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
         this.isCreateModalOpen = false;
         this.studentForm.reset({ fullName: '' });
 
-        // Instant feedback in table, then silent sync with backend ordering/state.
-        this.students = [createdStudent, ...this.students];
-        this.writeStudentsCache(this.students);
         this.showSuccessToast('Etudiant ajoute avec succes.');
-        this.loadStudents(false);
+        this.students = [createdStudent, ...this.students].slice(0, this.pageSize);
+        this.writeStudentsCache(this.students);
+        this.currentPage = 0;
+        this.loadStudents(this.currentPage, false);
+        this.loadStats();
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
@@ -173,27 +167,23 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     });
   }
 
-  get totalStudents(): number {
-    return this.students.length;
-  }
-
-  get globalAverage(): number {
-    if (this.students.length === 0) {
-      return 0;
+  loadPage(page: number): void {
+    if (page < 0 || page >= this.totalPages || page === this.currentPage) {
+      return;
     }
-    const sum = this.students.reduce((acc, student) => acc + Number(student.average ?? 0), 0);
-    return sum / this.students.length;
+
+    this.loadStudents(page, true);
   }
 
-  get studentsInAlert(): number {
-    return this.students.filter((student) => Number(student.average ?? 0) < 10).length;
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, index) => index);
   }
 
   get kpiCards(): KpiCard[] {
     return [
       {
         label: 'Total Étudiants',
-        value: String(this.totalStudents),
+        value: String(this.statsTotalStudents),
         icon: 'groups',
         cardClass: 'kpi-card kpi-blue',
         iconClass: 'material-symbols-outlined',
@@ -201,7 +191,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
       },
       {
         label: 'Moyenne Générale',
-        value: this.formatAverage(this.globalAverage),
+        value: this.formatAverage(this.statsGlobalAverage),
         unit: '/20',
         icon: 'trending_up',
         cardClass: 'kpi-card kpi-violet',
@@ -211,7 +201,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
       },
       {
         label: 'En Alerte',
-        value: String(this.studentsInAlert),
+        value: String(this.statsStudentsInAlert),
         icon: 'warning',
         cardClass: 'kpi-card kpi-red',
         iconClass: 'material-symbols-outlined',
@@ -222,6 +212,42 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
 
   formatAverage(value: number): string {
     return Number(value ?? 0).toFixed(2);
+  }
+
+  private loadStudents(page: number, showLoader: boolean): void {
+    this.loading = showLoader;
+    if (showLoader) {
+      this.errorMessage = '';
+    }
+
+    this.studentService.getStudents(page, this.pageSize).subscribe({
+      next: (response) => {
+        this.students = response.content;
+        this.currentPage = response.number;
+        this.totalPages = response.totalPages;
+        this.writeStudentsCache(response.content);
+        this.loading = false;
+      },
+      error: () => {
+        if (this.students.length === 0) {
+          this.errorMessage = 'Impossible de charger les etudiants.';
+        }
+        this.loading = false;
+      },
+    });
+  }
+
+  private loadStats(): void {
+    this.studentService.getStudentStats().subscribe({
+      next: (stats: StudentStatsResponse) => {
+        this.statsTotalStudents = Number(stats.totalStudents ?? 0);
+        this.statsGlobalAverage = Number(stats.globalAverage ?? 0);
+        this.statsStudentsInAlert = Number(stats.studentsInAlert ?? 0);
+      },
+      error: () => {
+        // Keep current values if stats endpoint is unavailable.
+      },
+    });
   }
 
   private readStudentsCache(): Student[] {
@@ -267,4 +293,3 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     }, 2600);
   }
 }
-

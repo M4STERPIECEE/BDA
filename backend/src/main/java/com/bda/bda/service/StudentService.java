@@ -2,14 +2,18 @@ package com.bda.bda.service;
 
 import com.bda.bda.dto.request.StudentRequest;
 import com.bda.bda.dto.response.StudentResponse;
+import com.bda.bda.dto.response.StudentStatsResponse;
 import com.bda.bda.exception.ResourceNotFoundException;
 import com.bda.bda.exception.StudentAlreadyExistsException;
 import com.bda.bda.model.Student;
 import com.bda.bda.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +22,19 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
 
-    public List<StudentResponse> findAll() {
-        return studentRepository.findAll().stream().map(this::toResponse).toList();
+    public Page<StudentResponse> findAll(Pageable pageable) {
+        return studentRepository.findAll(pageable).map(this::toResponse);
+    }
+
+    public StudentStatsResponse getStats() {
+        Number averageAggregate = studentRepository.getAverageOfAllStudents();
+        double averageValue = averageAggregate == null ? 0d : averageAggregate.doubleValue();
+
+        return new StudentStatsResponse(
+                studentRepository.count(),
+            BigDecimal.valueOf(averageValue).setScale(2, RoundingMode.HALF_UP),
+                studentRepository.countByAverageLessThan(BigDecimal.TEN)
+        );
     }
 
     public StudentResponse findById(Integer id) {
