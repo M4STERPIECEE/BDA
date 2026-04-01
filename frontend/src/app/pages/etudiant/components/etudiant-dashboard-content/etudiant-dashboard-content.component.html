@@ -1,105 +1,89 @@
-<main class="flex flex-col items-start gap-10 px-10 pb-12 pt-8 relative self-stretch w-full">
-  <section class="gap-2 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-      <div>
-        <nav class="mb-2 flex gap-2 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-          <span class="opacity-60">Curator</span>
-          <span class="opacity-30">></span>
-          <span class="text-primary">Tableau de bord</span>
-        </nav>
-        <h1 class="text-4xl font-extrabold tracking-tight text-on-surface">
-          Tableau de bord
-        </h1>
-        <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-          <p class="relative flex items-center self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium text-[#434655] text-base tracking-[0] leading-6">
-            Bienvenue. Voici l'aperu actuel de la performance academique.
-          </p>
+<main class="dashboard-page px-8 pb-14 pt-10">
+  <section class="mb-10">
+    <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
+      <span class="crumb-muted">Curator</span>
+      <span class="crumb-sep">›</span>
+      <span class="crumb-active">Tableau de bord</span>
+    </nav>
+    <h1 class="page-title">Tableau de bord</h1>
+    <p class="page-subtitle">Bienvenue. Voici l'aperçu actuel de la performance académique.</p>
+  </section>
+  <div class="stat-grid mb-10">
+    <article *ngFor="let card of statCards" class="stat-card" [ngClass]="card.accentClass">
+      <div class="stat-card-inner">
+        <div class="stat-card-top">
+          <div class="stat-icon-wrap">
+            <img [src]="card.cornerIcon" alt="" aria-hidden="true" class="stat-icon-img" />
+          </div>
+        </div>
+        <p class="stat-label">{{ card.label }}</p>
+        <div class="stat-value-row">
+          <strong class="stat-value">{{ card.value }}</strong>
+          <span *ngIf="card.suffix" class="stat-suffix">{{ card.suffix }}</span>
+        </div>
+        <div *ngIf="card.footerText" class="stat-footer">
+          <img *ngIf="card.footerIcon" [src]="card.footerIcon" alt="" aria-hidden="true" class="stat-footer-icon" />
+          <span class="stat-footer-text" [ngClass]="card.footerTrend" [innerHTML]="card.footerText"></span>
         </div>
       </div>
-  </section>
-  <div class="grid grid-cols-4 grid-rows-[156px] h-fit gap-6 self-stretch w-full">
-    <article *ngFor="let card of statCards" [ngClass]="card.cardClass">
-      <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-        <span [ngClass]="card.labelClass">{{ card.label }}</span>
-      </div>
-      <div [ngClass]="card.valueRowClass">
-        <strong [ngClass]="card.valueClass">{{ card.value }}</strong>
-        <span *ngIf="card.suffix" [ngClass]="card.suffixClass">{{ card.suffix }}</span>
-      </div>
-      <div *ngIf="card.footerText" [ngClass]="card.footerClass">
-        <img *ngIf="card.footerIcon" class="relative flex-[0_0_auto]" [src]="card.footerIcon" alt="" aria-hidden="true" />
-        <div *ngIf="card.footerTextClass" [ngClass]="card.footerTextClass" [innerHTML]="card.footerText"></div>
-      </div>
-      <img *ngIf="card.cornerIcon" [ngClass]="card.cornerIconClass" [src]="card.cornerIcon" alt="" aria-hidden="true" />
+      <div class="stat-card-glow"></div>
     </article>
   </div>
-  <div class="grid grid-cols-3 grid-rows-[518.50px] h-fit gap-8 self-stretch w-full">
-    <section class="relative row-[1_/_2] col-[1_/_3] [align-self:start] w-full h-fit flex flex-col items-start gap-8 p-8 bg-white rounded-xl" aria-label="Distribution des resultats">
-      <div class="flex items-center justify-between relative self-stretch w-full flex-[0_0_auto]">
-        <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-          <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-            <h2 class="relative w-[246.11px] h-7 mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#191b23] text-xl tracking-[0] leading-7 whitespace-nowrap flex items-center">
-              Distribution des resultats
-            </h2>
-          </div>
-          <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-            <p class="relative w-[227.14px] h-5 mt-[-1.00px] [font-family:'Poppins',Helvetica] font-normal text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
-              Performance par tranche de notes
-            </p>
-          </div>
+  <div class="bottom-grid">
+    <section class="chart-card" aria-label="Distribution des résultats">
+      <div class="chart-header">
+        <div>
+          <h2 class="section-title">Distribution des résultats</h2>
+          <p class="section-sub">Performance par tranche de notes</p>
         </div>
-        <div class="relative w-[119px] h-8 bg-[#f3f3fe] rounded-lg">
-          <img class="absolute top-0 left-0 w-[119px] h-8" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/image-fill.svg" alt="" aria-hidden="true" />
-          <div class="inline-flex flex-col items-start pl-0 pr-[3.02px] py-0 absolute top-[calc(50.00%_-_8px)] left-3">
-            <span class="relative w-[63.98px] h-4 mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#434655] text-xs tracking-[0] leading-4 whitespace-nowrap flex items-center">
-              Semestre 1
-            </span>
+        <div class="semester-badge">
+          <span class="material-symbols-outlined">calendar_month</span>
+          Semestre 1
+        </div>
+      </div>
+      <div class="bar-chart" role="img" aria-label="Graphique de distribution des résultats">
+        <div *ngFor="let bucket of resultBuckets" class="bar-group">
+          <div class="bar-fill" [style.height]="bucket.height"></div>
+          <span class="bar-label">{{ bucket.range }}</span>
+        </div>
+        <div class="chart-grid">
+          <div *ngFor="let line of gridLines" class="grid-line">
+            <span class="grid-label">{{ line }}</span>
           </div>
         </div>
       </div>
-      <div class="flex h-64 items-end justify-between pl-4 pr-[16.02px] py-0 relative self-stretch w-full border-b [border-bottom-style:solid] border-[#c3c6d74c]" role="img" aria-label="Graphique de distribution des resultats par tranche de notes">
-        <div *ngFor="let bucket of resultBuckets" class="flex flex-col items-center pt-2 pb-0 px-0 relative flex-1 grow">
-          <span class="relative self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#434655] text-[10px] tracking-[0] leading-[15px] flex items-center">{{ bucket }}</span>
-        </div>
+      <div class="chart-legend">
+        <span class="legend-dot"></span>
+        <span class="legend-text">Nombre d'étudiants par tranche</span>
       </div>
     </section>
-    <aside class="relative row-[1_/_2] col-[3_/_4] [align-self:start] w-full h-fit flex flex-col items-start gap-6 p-8 bg-[#f3f3fe] rounded-xl" aria-label="Actions rapides">
-      <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-        <h2 class="relative flex items-center self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#191b23] text-xl tracking-[0] leading-7">
-          Actions rapides
-        </h2>
-      </div>
-      <div class="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-        <button *ngFor="let action of quickActions" type="button" class="all-[unset] box-border flex justify-between p-4 self-stretch w-full bg-white rounded-xl items-center relative flex-[0_0_auto] cursor-pointer" [attr.aria-label]="action.ariaLabel">
-          <div class="inline-flex items-center gap-[11.99px] relative flex-[0_0_auto]">
-            <img class="relative flex-[0_0_auto]" [src]="action.icon" alt="" aria-hidden="true" />
-            <div class="inline-flex flex-col items-center relative flex-[0_0_auto]">
-              <span class="relative justify-center w-[110.67px] h-5 mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#191b23] text-sm text-center tracking-[0] leading-5 whitespace-nowrap flex items-center">
-                {{ action.label }}
-              </span>
+    <aside class="sidebar-col" aria-label="Actions rapides">
+      <div class="quick-actions-card">
+        <h2 class="section-title mb-5">Actions rapides</h2>
+        <div class="actions-list">
+          <button *ngFor="let action of quickActions" type="button" class="action-item" [attr.aria-label]="action.ariaLabel">
+            <div class="action-left">
+              <div class="action-icon-wrap">
+                <img [src]="action.icon" alt="" aria-hidden="true" class="action-icon-img" />
+              </div>
+              <span class="action-label">{{ action.label }}</span>
             </div>
-          </div>
-        </button>
-      </div>
-      <div class="flex flex-col items-start pt-8 pb-6 px-6 relative self-stretch w-full flex-[0_0_auto] bg-blue-600 rounded-xl overflow-hidden">
-        <img class="absolute -right-7 -bottom-7 w-[107px] h-[90px]" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/container-10.svg" alt="" aria-hidden="true" />
-        <div class="flex flex-col items-start gap-2 relative self-stretch w-full flex-[0_0_auto]">
-          <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-            <h3 class="relative flex items-center self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#eeefff] text-base tracking-[0] leading-6">
-              Besoin d'aide ?
-            </h3>
-          </div>
-          <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto] opacity-90">
-            <p class="relative self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-normal text-[#eeefff] text-xs tracking-[0] leading-[19.5px]">
-              Consultez notre guide de<br />gestion des moyennes<br />semestrielles.
-            </p>
-          </div>
-          <button type="button" class="all-[unset] box-border inline-flex justify-center pt-[7.5px] pb-0 px-0 items-center relative flex-[0_0_auto] cursor-pointer">
-            <span class="relative justify-center w-[128.56px] h-4 mt-[-1.00px] [font-family:'Poppins',Helvetica] font-bold text-[#eeefff] text-xs text-center tracking-[0] leading-4 underline whitespace-nowrap flex items-center">
-              Voir la documentation
-            </span>
+            <span class="material-symbols-outlined action-arrow">arrow_forward</span>
           </button>
         </div>
       </div>
+      <div class="help-banner">
+        <div class="help-bg-orb"></div>
+        <span class="material-symbols-outlined help-icon-big">auto_stories</span>
+        <h3 class="help-title">Besoin d'aide&nbsp;?</h3>
+        <p class="help-body">Consultez notre guide de gestion des moyennes semestrielles.</p>
+        <button type="button" class="help-btn">
+          Voir la documentation
+          <span class="material-symbols-outlined">open_in_new</span>
+        </button>
+      </div>
+
     </aside>
   </div>
+
 </main>

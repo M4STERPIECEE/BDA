@@ -1,115 +1,149 @@
-<main class="students-page bg-[#faf8ff] px-10 pb-12 pt-8">
-  <div class="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+<main class="students-page px-8 pb-14 pt-10">
+
+  <!-- ── Header ── -->
+  <div class="page-header mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
     <div>
-      <nav class="mb-2 flex gap-2 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-        <span class="opacity-60">Curator</span>
-        <span class="opacity-30">></span>
-        <span class="text-primary">Etudiants</span>
+      <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
+        <span class="crumb-muted">Curator</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-active">Étudiants</span>
       </nav>
-      <h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Gestion des Etudiants</h2>
-      <p class="relative flex items-center self-stretch mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium text-[#434655] text-base tracking-[0] leading-6">
-        Consultez, gerez et suivez les performances academiques de la cohorte etudiante.
-      </p>
+      <h2 class="page-title">Gestion des Étudiants</h2>
+      <p class="page-subtitle">Consultez, gérez et suivez les performances académiques de la cohorte étudiante.</p>
     </div>
-    <button class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-6 py-3.5 text-sm font-bold text-on-primary shadow-xl shadow-primary/20 transition-transform hover:scale-[1.02]">
-      <span class="material-symbols-outlined text-xl">person_add</span>
-      Nouveau etudiant
+    <button class="btn-primary">
+      <span class="material-symbols-outlined">person_add</span>
+      Nouveau étudiant
     </button>
   </div>
 
-  <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-3 cardTotal">
-    <div class="flex items-start justify-between rounded-xl bg-surface-container-lowest p-6">
-      <div>
-        <p class="mb-1 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Total Etudiants</p>
-        <h3 class="text-3xl font-bold text-on-surface">{{ totalStudents }}</h3>
+  <!-- ── KPI Cards ── contenu-style -->
+  <div class="mb-10 grid grid-cols-1 gap-5 md:grid-cols-3 cardTotal contenu-style">
+
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-body">
+        <p class="kpi-label">Total Étudiants</p>
+        <h3 class="kpi-value">{{ totalStudents }}</h3>
       </div>
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed text-primary">
+      <div class="kpi-icon">
         <span class="material-symbols-outlined">groups</span>
       </div>
+      <div class="kpi-glow"></div>
     </div>
-    <div class="flex items-start justify-between rounded-xl bg-surface-container-lowest p-6">
-      <div>
-        <p class="mb-1 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Moyenne Generale</p>
-        <h3 class="text-3xl font-bold text-on-surface">{{ formatAverage(globalAverage) }}/20</h3>
+
+    <div class="kpi-card kpi-violet">
+      <div class="kpi-body">
+        <p class="kpi-label">Moyenne Générale</p>
+        <h3 class="kpi-value">{{ formatAverage(globalAverage) }}<span class="kpi-unit">/20</span></h3>
       </div>
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary-fixed text-on-secondary-fixed-variant">
+      <div class="kpi-icon">
         <span class="material-symbols-outlined">trending_up</span>
       </div>
+      <div class="kpi-glow"></div>
     </div>
-    <div class="flex items-start justify-between rounded-xl bg-surface-container-lowest p-6">
-      <div>
-        <p class="mb-1 text-xs font-bold uppercase tracking-widest text-on-surface-variant">En Alerte</p>
-        <h3 class="text-3xl font-bold text-on-surface">{{ studentsInAlert }}</h3>
+
+    <div class="kpi-card kpi-red">
+      <div class="kpi-body">
+        <p class="kpi-label">En Alerte</p>
+        <h3 class="kpi-value">{{ studentsInAlert }}</h3>
       </div>
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-error-container text-error">
+      <div class="kpi-icon">
         <span class="material-symbols-outlined">warning</span>
       </div>
+      <div class="kpi-glow"></div>
     </div>
+
   </div>
 
-  <section class="overflow-hidden rounded-xl bg-surface-container-low shadow-sm">
-    <div class="table-wrapper overflow-x-auto">
-      <table class="w-full border-collapse">
-        <thead class="sticky top-0 z-10 bg-surface-container-highest text-on-surface-variant">
+  <!-- ── Table Section ── -->
+  <section class="table-card">
+
+    <!-- Table toolbar -->
+    <div class="table-toolbar">
+      <p class="toolbar-title">Liste des étudiants</p>
+      <div class="toolbar-actions">
+        <div class="search-wrap">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input class="search-input" placeholder="Rechercher un étudiant…" type="text" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
           <tr>
-            <th class="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest">ID Etudiant</th>
-            <th class="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest">Nom complet</th>
-            <th class="px-8 py-4 text-left text-xs font-bold uppercase tracking-widest">Moyenne (/20)</th>
-            <th class="px-8 py-4 text-right text-xs font-bold uppercase tracking-widest">Actions</th>
+            <th>ID Étudiant</th>
+            <th>Nom complet</th>
+            <th>Moyenne (/20)</th>
+            <th class="text-right">Actions</th>
           </tr>
         </thead>
 
-        <tbody class="text-sm" *ngIf="!loading && !errorMessage">
-          <tr *ngFor="let student of students" class="group bg-surface-container-lowest transition-colors hover:bg-surface-container even:bg-surface">
-            <td class="px-8 py-5 font-mono font-medium text-on-surface-variant">#{{ student.studentId }}</td>
-            <td class="px-8 py-5">
-              <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-high text-xs font-bold text-on-surface-variant">
-                  {{ student.fullName.slice(0, 1) }}
-                </div>
-                <span class="font-semibold text-on-surface">{{ student.fullName }}</span>
+        <tbody *ngIf="!loading && !errorMessage">
+          <tr *ngFor="let student of students; let i = index" class="data-row" [style.animation-delay]="i * 40 + 'ms'">
+
+            <td>
+              <span class="student-id">#{{ student.studentId }}</span>
+            </td>
+
+            <td>
+              <div class="student-name-cell">
+                <div class="avatar">{{ student.fullName.slice(0, 1) }}</div>
+                <span class="student-name">{{ student.fullName }}</span>
               </div>
             </td>
-            <td class="px-8 py-5">
-              <span class="font-bold" [class.text-secondary]="student.average >= 10" [class.text-error]="student.average < 10">
+
+            <td>
+              <span class="avg-badge" [class.avg-good]="student.average >= 10" [class.avg-bad]="student.average < 10">
                 {{ formatAverage(student.average) }}
               </span>
             </td>
-            <td class="px-8 py-5 text-right">
-              <div class="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                <button class="flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-primary" type="button">
-                  <span class="material-symbols-outlined text-xl">visibility</span>
+
+            <td class="text-right">
+              <div class="row-actions">
+                <button class="action-btn action-view" type="button" title="Voir">
+                  <span class="material-symbols-outlined">visibility</span>
                 </button>
-                <button class="flex h-9 w-9 items-center justify-center rounded-lg text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-primary" type="button">
-                  <span class="material-symbols-outlined text-xl">edit</span>
+                <button class="action-btn action-edit" type="button" title="Modifier">
+                  <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button class="flex h-9 w-9 items-center justify-center rounded-lg text-[#DC2626] transition-all hover:bg-error-container/20" type="button">
-                  <span class="material-symbols-outlined text-xl">delete</span>
+                <button class="action-btn action-delete" type="button" title="Supprimer">
+                  <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
             </td>
+
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div *ngIf="loading" class="px-8 py-10 text-sm text-on-surface-variant">Chargement des etudiants...</div>
-    <div *ngIf="!loading && errorMessage" class="px-8 py-10 text-sm text-error">{{ errorMessage }}</div>
+    <!-- States -->
+    <div *ngIf="loading" class="table-state">
+      <div class="loader-dots"><span></span><span></span><span></span></div>
+      <p>Chargement des étudiants…</p>
+    </div>
+    <div *ngIf="!loading && errorMessage" class="table-state table-error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMessage }}</p>
+    </div>
 
-    <div class="flex items-center justify-between bg-surface-container-lowest px-8 py-4">
-      <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-        Affichage de {{ students.length }} etudiant(s)
-      </p>
-      <div class="flex gap-2">
-        <button class="rounded-lg bg-surface-container p-2 text-on-surface-variant" type="button">
+    <!-- Footer / Pagination -->
+    <div class="table-footer">
+      <p class="footer-count">{{ students.length }} étudiant(s) affiché(s)</p>
+      <div class="pagination">
+        <button class="page-btn" type="button">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="rounded-lg bg-primary-fixed px-4 py-2 text-xs font-bold text-primary" type="button">1</button>
-        <button class="rounded-lg bg-surface-container p-2 text-on-surface-variant" type="button">
+        <button class="page-btn page-active" type="button">1</button>
+        <button class="page-btn" type="button">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
     </div>
-  </section>
-</main>
 
+  </section>
+
+</main>
