@@ -40,7 +40,7 @@ interface StudentStatsResponse {
   styleUrl: './etudiant-students-content.component.css',
 })
 export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
-  private readonly studentsCacheKey = 'bda_students_cache_v1';
+  private readonly studentsCacheKey = 'bda_students_cache_v2';
   private readonly pageSize = 5;
   private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 

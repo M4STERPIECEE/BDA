@@ -48,7 +48,7 @@
         <tbody *ngIf="!loading && !errorMessage">
           <tr *ngFor="let student of students; let i = index" class="data-row" [style.animation-delay]="i * 40 + 'ms'">
             <td>
-              <span class="student-id">#{{ student.studentId }}</span>
+              <span class="student-id">{{ student.studentCode || ('#' + student.studentId) }}</span>
             </td>
             <td>
               <div class="student-name-cell">

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Year;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,8 @@ public class StudentService {
     }
 
     private StudentResponse toResponse(Student s) {
-        return new StudentResponse(s.getStudentId(), s.getFullName(), s.getAverage());
+        int currentYear = Year.now().getValue();
+        String studentCode = String.format("ETU%d%03d", currentYear, s.getStudentId());
+        return new StudentResponse(s.getStudentId(), studentCode, s.getFullName(), s.getAverage());
     }
 }
