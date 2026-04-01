@@ -1,7 +1,5 @@
-<main class="students-page px-8 pb-14 pt-10">
-
-  <!-- ── Header ── -->
-  <div class="page-header mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+<main class="students-page px-8 pb-14 pt-5">
+  <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end header-style">
     <div>
       <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
         <span class="crumb-muted">Curator</span>
@@ -11,116 +9,69 @@
       <h2 class="page-title">Gestion des Étudiants</h2>
       <p class="page-subtitle">Consultez, gérez et suivez les performances académiques de la cohorte étudiante.</p>
     </div>
-    <button class="btn-primary">
-      <span class="material-symbols-outlined">person_add</span>
-      Nouveau étudiant
-    </button>
   </div>
-
-  <!-- ── KPI Cards ── contenu-style -->
-  <div class="mb-10 grid grid-cols-1 gap-5 md:grid-cols-3 cardTotal contenu-style">
-
-    <div class="kpi-card kpi-blue">
+  <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-3 cardTotal contenu-style">
+    <div *ngFor="let card of kpiCards" [ngClass]="card.cardClass">
       <div class="kpi-body">
-        <p class="kpi-label">Total Étudiants</p>
-        <h3 class="kpi-value">{{ totalStudents }}</h3>
+        <p class="kpi-label">{{ card.label }}</p>
+        <h3 [ngClass]="card.valueClass">
+          {{ card.value }}<span *ngIf="card.unit" [ngClass]="card.unitClass">{{ card.unit }}</span>
+        </h3>
       </div>
       <div class="kpi-icon">
-        <span class="material-symbols-outlined">groups</span>
+        <span [ngClass]="card.iconClass">{{ card.icon }}</span>
       </div>
       <div class="kpi-glow"></div>
     </div>
-
-    <div class="kpi-card kpi-violet">
-      <div class="kpi-body">
-        <p class="kpi-label">Moyenne Générale</p>
-        <h3 class="kpi-value">{{ formatAverage(globalAverage) }}<span class="kpi-unit">/20</span></h3>
-      </div>
-      <div class="kpi-icon">
-        <span class="material-symbols-outlined">trending_up</span>
-      </div>
-      <div class="kpi-glow"></div>
-    </div>
-
-    <div class="kpi-card kpi-red">
-      <div class="kpi-body">
-        <p class="kpi-label">En Alerte</p>
-        <h3 class="kpi-value">{{ studentsInAlert }}</h3>
-      </div>
-      <div class="kpi-icon">
-        <span class="material-symbols-outlined">warning</span>
-      </div>
-      <div class="kpi-glow"></div>
-    </div>
-
   </div>
-
-  <!-- ── Table Section ── -->
   <section class="table-card">
-
-    <!-- Table toolbar -->
     <div class="table-toolbar">
       <p class="toolbar-title">Liste des étudiants</p>
-      <div class="toolbar-actions">
+      <div class="toolbar-actions flex items-center gap-3">
         <div class="search-wrap">
           <span class="material-symbols-outlined search-icon">search</span>
           <input class="search-input" placeholder="Rechercher un étudiant…" type="text" />
         </div>
+        <button class="btn-primary" type="button">
+          <span class="material-symbols-outlined">person_add</span>
+          Nouveau étudiant
+        </button>
       </div>
     </div>
-
-    <!-- Table -->
     <div class="table-wrapper">
       <table class="data-table">
         <thead>
           <tr>
-            <th>ID Étudiant</th>
-            <th>Nom complet</th>
-            <th>Moyenne (/20)</th>
-            <th class="text-right">Actions</th>
+            <th *ngFor="let header of tableHeaders" [ngClass]="header.className">{{ header.label }}</th>
           </tr>
         </thead>
-
         <tbody *ngIf="!loading && !errorMessage">
           <tr *ngFor="let student of students; let i = index" class="data-row" [style.animation-delay]="i * 40 + 'ms'">
-
             <td>
               <span class="student-id">#{{ student.studentId }}</span>
             </td>
-
             <td>
               <div class="student-name-cell">
                 <div class="avatar">{{ student.fullName.slice(0, 1) }}</div>
                 <span class="student-name">{{ student.fullName }}</span>
               </div>
             </td>
-
             <td>
               <span class="avg-badge" [class.avg-good]="student.average >= 10" [class.avg-bad]="student.average < 10">
                 {{ formatAverage(student.average) }}
               </span>
             </td>
-
             <td class="text-right">
               <div class="row-actions">
-                <button class="action-btn action-view" type="button" title="Voir">
-                  <span class="material-symbols-outlined">visibility</span>
-                </button>
-                <button class="action-btn action-edit" type="button" title="Modifier">
-                  <span class="material-symbols-outlined">edit</span>
-                </button>
-                <button class="action-btn action-delete" type="button" title="Supprimer">
-                  <span class="material-symbols-outlined">delete</span>
+                <button *ngFor="let action of rowActions" [ngClass]="action.className" type="button" [title]="action.title">
+                  <span class="material-symbols-outlined">{{ action.icon }}</span>
                 </button>
               </div>
             </td>
-
           </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- States -->
     <div *ngIf="loading" class="table-state">
       <div class="loader-dots"><span></span><span></span><span></span></div>
       <p>Chargement des étudiants…</p>
@@ -129,8 +80,6 @@
       <span class="material-symbols-outlined">error_outline</span>
       <p>{{ errorMessage }}</p>
     </div>
-
-    <!-- Footer / Pagination -->
     <div class="table-footer">
       <p class="footer-count">{{ students.length }} étudiant(s) affiché(s)</p>
       <div class="pagination">
@@ -143,7 +92,5 @@
         </button>
       </div>
     </div>
-
   </section>
-
 </main>
