@@ -19,7 +19,6 @@ interface QuickAction {
 
 interface ResultBucket {
   range: string;
-  height: string;
   count: number;
 }
 
@@ -71,13 +70,13 @@ export class EtudiantDashboardContentComponent {
   ];
 
   readonly resultBuckets: ResultBucket[] = [
-    { range: '0–5',   height: '30px',  count: 8  },
-    { range: '5–10',  height: '75px',  count: 22 },
-    { range: '10–15', height: '140px', count: 42 },
-    { range: '15–20', height: '90px',  count: 27 },
+    { range: '0–5', count: 8 },
+    { range: '5–10', count: 22 },
+    { range: '10–15', count: 42 },
+    { range: '15–20', count: 27 },
   ];
 
-  readonly gridLines = ['50', '40', '30', '20', '10'];
+  readonly gridLines = this.buildGridLines();
 
   readonly quickActions: QuickAction[] = [
     {
@@ -96,4 +95,20 @@ export class EtudiantDashboardContentComponent {
       ariaLabel: 'Ajouter une note',
     },
   ];
+
+  get chartBuckets(): Array<ResultBucket & { height: string }> {
+    const maxCount = Math.max(...this.resultBuckets.map((bucket) => bucket.count), 1);
+
+    return this.resultBuckets.map((bucket) => ({
+      ...bucket,
+      height: `${Math.max((bucket.count / maxCount) * 100, 12)}%`,
+    }));
+  }
+
+  private buildGridLines(): string[] {
+    const maxCount = Math.max(...this.resultBuckets.map((bucket) => bucket.count), 10);
+    const step = Math.ceil(maxCount / 5);
+
+    return Array.from({ length: 5 }, (_, index) => String(step * (5 - index)));
+  }
 }

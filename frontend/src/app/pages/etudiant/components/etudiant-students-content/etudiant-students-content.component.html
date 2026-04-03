@@ -32,6 +32,9 @@
           <span class="material-symbols-outlined search-icon">search</span>
           <input class="search-input" placeholder="Rechercher un étudiant…" type="text" />
         </div>
+        <button class="refresh-btn" type="button" (click)="refreshStudents()" [disabled]="loading" title="Actualiser la liste">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
         <button class="btn-primary" type="button" (click)="openCreateModal()">
           <span class="material-symbols-outlined">person_add</span>
           Nouveau étudiant
@@ -69,15 +72,27 @@
             </td>
           </tr>
         </tbody>
+        <tbody *ngIf="loading">
+          <tr>
+            <td class="state-cell" [attr.colspan]="tableHeaders.length">
+              <div class="table-state">
+                <div class="loader-dots"><span></span><span></span><span></span></div>
+                <p>Chargement des étudiants…</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="!loading && errorMessage">
+          <tr>
+            <td class="state-cell" [attr.colspan]="tableHeaders.length">
+              <div class="table-state table-error">
+                <span class="material-symbols-outlined">error_outline</span>
+                <p>{{ errorMessage }}</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
       </table>
-    </div>
-    <div *ngIf="loading" class="table-state">
-      <div class="loader-dots"><span></span><span></span><span></span></div>
-      <p>Chargement des étudiants…</p>
-    </div>
-    <div *ngIf="!loading && errorMessage" class="table-state table-error">
-      <span class="material-symbols-outlined">error_outline</span>
-      <p>{{ errorMessage }}</p>
     </div>
     <div class="table-footer">
       <p class="footer-count">{{ students.length }} étudiant(s) affiché(s) sur {{ displayedTotalStudents }} au total</p>

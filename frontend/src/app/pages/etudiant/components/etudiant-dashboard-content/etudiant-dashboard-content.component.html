@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="bar-chart" role="img" aria-label="Graphique de distribution des résultats">
-        <div *ngFor="let bucket of resultBuckets" class="bar-group">
+        <div *ngFor="let bucket of chartBuckets" class="bar-group" [attr.aria-label]="bucket.range + ': ' + bucket.count + ' étudiants'">
           <div class="bar-fill" [style.height]="bucket.height"></div>
           <span class="bar-label">{{ bucket.range }}</span>
         </div>
