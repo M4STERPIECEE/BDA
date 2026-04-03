@@ -175,6 +175,11 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     this.loadStudents(page, true);
   }
 
+  refreshStudents(): void {
+    this.loadStudents(this.currentPage, true);
+    this.loadStats();
+  }
+
   get pages(): number[] {
     const visiblePageCount = this.totalPages > 0 ? this.totalPages : (this.students.length > 0 ? 1 : 0);
     return Array.from({ length: visiblePageCount }, (_, index) => index);

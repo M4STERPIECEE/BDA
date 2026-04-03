@@ -14,20 +14,26 @@
     </div>
   </div>
   <div class="relative flex-1 self-stretch w-full grow">
-    <a routerLink="/etudiant/dashboard" routerLinkActive="bg-[#dbe1ff]" [routerLinkActiveOptions]="{ exact: true }" class="flex w-[calc(100%_-_32px)] items-center px-4 py-3 absolute top-0 left-5 rounded-[0px_8px_8px_0px] no-underline" aria-current="page">
-      <div class="relative w-[36.02px] h-6 flex items-center justify-center">
+    <a routerLink="/etudiant/dashboard" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #dashboardRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-0 left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
+      [ngClass]="dashboardRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+      <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
         <app-icon-dashboard></app-icon-dashboard>
       </div>
       <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <span class="relative w-[74.65px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] font-bold text-[#004ac6] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
+        <span class="relative w-[74.65px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center"
+          [ngClass]="dashboardRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
           Tableau de bord
         </span>
       </div>
     </a>
-    <a routerLink="/etudiant/students" routerLinkActive="bg-[#dbe1ff] rounded-[0px_8px_8px_0px]" class="w-[calc(100%_-_32px)] absolute top-[52px] left-4 flex items-center px-4 py-3 no-underline">
-      <app-icon-etudiant></app-icon-etudiant>
+    <a routerLink="/etudiant/students" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #studentsRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[52px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
+      [ngClass]="studentsRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+      <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
+        <app-icon-etudiant></app-icon-etudiant>
+      </div>
       <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <span class="relative w-[62.38px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
+        <span class="relative w-[62.38px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center"
+          [ngClass]="studentsRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
           Etudiants
         </span>
       </div>
