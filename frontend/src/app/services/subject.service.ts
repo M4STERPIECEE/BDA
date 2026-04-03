@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { Subject } from '../models/subject.model';
 import { API_ENDPOINTS } from '../utils/api-config';
 
@@ -32,25 +32,34 @@ export class SubjectService {
   constructor(private readonly http: HttpClient) {}
 
   getSubjects(page = 0, size = 5, search = '', minCoefficient?: number): Observable<SubjectsApiResponse> {
-    const params: Record<string, string> = {
-      page: String(page),
-      size: String(size),
-      search,
+    const params: Record<string, string | number> = {
+      page: page,
+      size: size,
     };
-    if (minCoefficient !== undefined) {
-      params['minCoefficient'] = String(minCoefficient);
+        if (search && search.trim()) {
+      params['search'] = search.trim();
+    }
+        if (minCoefficient !== undefined && minCoefficient !== null) {
+      params['minCoefficient'] = minCoefficient;
     }
 
+    console.log('[SubjectService] getSubjects API call with params:', params);
+    
     return this.http.get<SubjectsApiResponse>(this.apiUrl, {
       params,
       headers: this.buildAuthHeaders(),
-    });
+    }).pipe(
+      timeout(15000)
+    );
   }
 
   getSubjectStats(): Observable<SubjectStatsResponse> {
+    console.log('[SubjectService] getSubjectStats API call');
     return this.http.get<SubjectStatsResponse>(this.statsUrl, {
       headers: this.buildAuthHeaders(),
-    });
+    }).pipe(
+      timeout(15000)
+    );
   }
 
   createSubject(payload: CreateSubjectRequest): Observable<Subject> {

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subject } from '../../../../models/subject.model';
 import { SubjectService, SubjectsApiResponse } from '../../../../services/subject.service';
@@ -79,6 +79,7 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
   constructor(
     private readonly subjectService: SubjectService,
     private readonly formBuilder: FormBuilder,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.subjectForm = this.formBuilder.nonNullable.group({
       label: ['', [Validators.required, Validators.maxLength(100)]],
@@ -87,7 +88,24 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.refreshSubjects(true);
+    const token = localStorage.getItem('bda_token');
+    if (!token) {
+      console.warn('[WARNING] No authentication token found in localStorage');
+      this.errorMessage = 'Authentification requise. Veuillez vous reconnecter.';
+      this.loading = false;
+      return;
+    }
+    console.log('[DEBUG] Token found, initializing subjects...');
+    
+    // Charger les stats en premier (généralement plus rapide)
+    console.log('[DEBUG] Loading stats first...');
+    this.loadStats();
+    
+    // Puis charger les sujets avec un léger délai pour ne pas surcharger le serveur
+    setTimeout(() => {
+      console.log('[DEBUG] Now loading subjects...');
+      this.loadSubjects(0, true);
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -230,31 +248,45 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     }
 
     const minCoefficient = this.filterHighCoefficientOnly ? 3 : undefined;
+    console.log('[DEBUG] loadSubjects called:', { page, pageSize: this.pageSize, search: this.searchTerm, minCoefficient, filterActive: this.filterHighCoefficientOnly });
+    
     this.subjectService.getSubjects(page, this.pageSize, this.searchTerm.trim(), minCoefficient).subscribe({
       next: (response) => {
+        console.log('[DEBUG] API response received:', response);
         const normalized = this.normalizeSubjectsResponse(response, page);
+        console.log('[DEBUG] Normalized response:', normalized);
         this.subjects = normalized.subjects;
         this.currentPage = normalized.currentPage;
         this.totalPages = normalized.totalPages;
         this.loading = false;
+        this.cdr.markForCheck();
+        console.log('[DEBUG] Component state updated:', { subjects: this.subjects.length, currentPage: this.currentPage, totalPages: this.totalPages });
       },
-      error: () => {
+      error: (error) => {
+        console.error('[DEBUG] API error:', error);
         this.subjects = Array.isArray(this.subjects) ? this.subjects : [];
         if (this.subjects.length === 0) {
           this.errorMessage = 'Impossible de charger les matières.';
         }
         this.loading = false;
+        this.cdr.markForCheck();  // Forcer même en cas d'erreur
       },
     });
   }
 
   private loadStats(): void {
+    console.log('[DEBUG] loadStats called');
     this.subjectService.getSubjectStats().subscribe({
       next: (stats) => {
+        console.log('[DEBUG] Stats response received:', stats);
         this.statsTotalSubjects = Number(stats.totalSubjects ?? 0);
         this.statsAverageCoefficient = Number(stats.averageCoefficient ?? 0);
+        this.cdr.markForCheck();
+        console.log('[DEBUG] Stats updated:', { totalSubjects: this.statsTotalSubjects, avgCoeff: this.statsAverageCoefficient });
       },
-      error: () => {
+      error: (error) => {
+        console.error('[DEBUG] Stats error:', error);
+        this.cdr.markForCheck();
       },
     });
   }
