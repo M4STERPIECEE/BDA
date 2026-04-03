@@ -9,5 +9,8 @@ export const API_ENDPOINTS = {
   students: {
     list: `${API_BASE_URL}/${API_VERSION}/students`,
   },
+  subjects: {
+    list: `${API_BASE_URL}/${API_VERSION}/subjects`,
+  },
 } as const;
 

@@ -2,14 +2,18 @@ package com.bda.bda.service;
 
 import com.bda.bda.dto.request.SubjectRequest;
 import com.bda.bda.dto.response.SubjectResponse;
+import com.bda.bda.dto.response.SubjectStatsResponse;
 import com.bda.bda.exception.ResourceNotFoundException;
 import com.bda.bda.exception.SubjectAlreadyExistsException;
 import com.bda.bda.model.Subject;
 import com.bda.bda.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +21,22 @@ import java.util.List;
 public class SubjectService {
     private final SubjectRepository subjectRepository;
 
-    public List<SubjectResponse> findAll() {
-        return subjectRepository.findAll().stream().map(this::toResponse).toList();
+    public Page<SubjectResponse> findAll(Pageable pageable, String search, BigDecimal minCoefficient) {
+        String normalizedSearch = search == null ? "" : search.trim();
+
+        if (minCoefficient != null) {
+            return subjectRepository
+                    .findByLabelContainingIgnoreCaseAndCoefficientGreaterThanEqual(normalizedSearch, minCoefficient, pageable)
+                    .map(this::toResponse);
+        }
+        return subjectRepository.findByLabelContainingIgnoreCase(normalizedSearch, pageable).map(this::toResponse);
+    }
+
+    public SubjectStatsResponse getStats() {
+        Number averageAggregate = subjectRepository.getAverageCoefficient();
+        double averageValue = averageAggregate == null ? 0d : averageAggregate.doubleValue();
+        return new SubjectStatsResponse(subjectRepository.count(),BigDecimal.valueOf(averageValue).setScale(2, RoundingMode.HALF_UP)
+        );
     }
 
     public SubjectResponse findById(Integer id) {
