@@ -269,7 +269,7 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
           this.errorMessage = 'Impossible de charger les matières.';
         }
         this.loading = false;
-        this.cdr.markForCheck();  // Forcer même en cas d'erreur
+        this.cdr.markForCheck();
       },
     });
   }
@@ -320,6 +320,6 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     this.toastTimeoutId = setTimeout(() => {
       this.successToastMessage = '';
       this.toastTimeoutId = null;
-    }, 1600);
+    }, 1100);
   }
 }

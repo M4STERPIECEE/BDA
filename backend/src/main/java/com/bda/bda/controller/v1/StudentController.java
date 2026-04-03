@@ -40,35 +40,45 @@ public class StudentController {
     }
 
     @GetMapping("/stats")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Student stats returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentStatsResponse.class)))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Student stats returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentStatsResponse.class)))
     })
     public ResponseEntity<StudentStatsResponse> getStats() {
         return ResponseEntity.ok(studentService.getStats());
     }
 
     @GetMapping("/{id}")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Student found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))), @ApiResponse(responseCode = "404", description = "Student not found")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Student found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Student not found")
     })
     public ResponseEntity<StudentResponse> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(studentService.findById(id));
     }
 
     @PostMapping
-    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Student created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))), @ApiResponse(responseCode = "400", description = "Invalid request body")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Student created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request body")
     })
     public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(studentService.create(request));
     }
 
     @PutMapping("/{id}")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Student updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))), @ApiResponse(responseCode = "400", description = "Invalid request body"), @ApiResponse(responseCode = "404", description = "Student not found")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Student updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "404", description = "Student not found")
     })
     public ResponseEntity<StudentResponse> update(@PathVariable Integer id, @Valid @RequestBody StudentRequest request) {
         return ResponseEntity.ok(studentService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Student deleted"), @ApiResponse(responseCode = "404", description = "Student not found")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Student deleted"),
+            @ApiResponse(responseCode = "404", description = "Student not found")
     })
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         studentService.delete(id);

@@ -1,5 +1,5 @@
 export interface Subject {
-  subjectId: number;
+  subjectId: string;
   label: string;
   coefficient: number;
 }
