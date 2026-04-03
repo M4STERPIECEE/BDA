@@ -38,10 +38,14 @@
         </span>
       </div>
     </a>
-    <a href="#" class="w-[calc(100%_-_32px)] absolute top-[104px] left-4 flex items-center px-4 py-3 no-underline">
-      <app-icon-matieres></app-icon-matieres>
+    <a routerLink="/etudiant/matieres" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #matieresRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[104px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
+      [ngClass]="matieresRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+      <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
+        <app-icon-matieres></app-icon-matieres>
+      </div>
       <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <span class="relative w-[58.16px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
+        <span class="relative w-[58.16px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center"
+          [ngClass]="matieresRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
           Matieres
         </span>
       </div>

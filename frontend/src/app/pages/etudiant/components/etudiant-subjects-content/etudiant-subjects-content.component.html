@@ -1,0 +1,119 @@
+<main class="subjects-page px-8 pb-14 pt-5">
+  <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end header-style">
+    <div>
+      <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
+        <span class="crumb-muted">Curator</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-active">Matières</span>
+      </nav>
+      <h2 class="page-title">Gestion des Matières</h2>
+      <p class="page-subtitle">Consultez, gérez et suivez les matières du semestre académique.</p>
+    </div>
+  </div>
+
+  <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-3 cardTotal contenu-style">
+    <div *ngFor="let card of kpiCards" [ngClass]="card.cardClass">
+      <div class="kpi-body">
+        <p class="kpi-label">{{ card.label }}</p>
+        <h3 [ngClass]="card.valueClass">{{ card.value }}</h3>
+        <div *ngIf="card.footerText" class="kpi-footer-row">
+          <img *ngIf="card.footerIcon" [src]="card.footerIcon" alt="" aria-hidden="true" class="kpi-footer-icon" [ngClass]="card.footerClass" />
+          <p class="kpi-footer-text" [ngClass]="card.footerClass">{{ card.footerText }}</p>
+        </div>
+      </div>
+      <div class="kpi-icon">
+        <span [ngClass]="card.iconClass">{{ card.icon }}</span>
+      </div>
+      <div class="kpi-glow"></div>
+    </div>
+  </div>
+
+  <section class="table-card">
+    <div class="table-toolbar">
+      <p class="toolbar-title">Liste des matières</p>
+      <div class="toolbar-actions flex items-center gap-3">
+        <div class="search-wrap">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input class="search-input" placeholder="Rechercher une matière…" type="text" />
+        </div>
+        <button class="refresh-btn" type="button" (click)="refreshSubjects()" [disabled]="loading" title="Actualiser la liste">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+        <button class="btn-primary" type="button">
+          <span class="material-symbols-outlined">post_add</span>
+          Nouvelles matières
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th *ngFor="let header of tableHeaders" [ngClass]="header.className">{{ header.label }}</th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="!loading && !errorMessage">
+          <tr *ngFor="let subject of subjects; let i = index" class="data-row" [style.animation-delay]="i * 40 + 'ms'">
+            <td>
+              <span class="student-id">{{ subject.subjectId }}</span>
+            </td>
+            <td>
+              <div class="student-name-cell">
+                <span class="student-name">{{ subject.designation }}</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="avg-badge avg-good">{{ formatCoefficient(subject.coefficient) }}</span>
+            </td>
+            <td class="text-right">
+              <div class="row-actions">
+                <button *ngFor="let action of rowActions" [ngClass]="action.className" type="button" [title]="action.title">
+                  <span class="material-symbols-outlined">{{ action.icon }}</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="loading">
+          <tr>
+            <td class="state-cell" [attr.colspan]="tableHeaders.length">
+              <div class="table-state">
+                <div class="loader-dots"><span></span><span></span><span></span></div>
+                <p>Chargement des matières…</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="!loading && errorMessage">
+          <tr>
+            <td class="state-cell" [attr.colspan]="tableHeaders.length">
+              <div class="table-state table-error">
+                <span class="material-symbols-outlined">error_outline</span>
+                <p>{{ errorMessage }}</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <p class="footer-count">{{ subjects.length }} matière(s) affichée(s) sur {{ displayedTotalSubjects }} au total</p>
+      <div class="pagination">
+        <button class="page-btn" type="button" (click)="loadPage(currentPage - 1)" [disabled]="currentPage === 0">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button *ngFor="let page of pages" class="page-btn" [class.page-active]="page === currentPage" type="button" (click)="loadPage(page)">
+          {{ page + 1 }}
+        </button>
+        <button class="page-btn" type="button" (click)="loadPage(currentPage + 1)" [disabled]="currentPage >= totalPages - 1">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
