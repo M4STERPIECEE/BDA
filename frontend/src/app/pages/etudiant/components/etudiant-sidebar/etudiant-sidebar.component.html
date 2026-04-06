@@ -1,8 +1,4 @@
-<nav
-  class="fixed top-0 left-0 z-40 flex h-screen w-64 flex-col items-start justify-between overflow-hidden bg-[#f3f3fe] px-0 py-8 shadow-[24px_8px_24px_#131b230a]"
-  aria-label="Navigation principale">
-
-  <!-- ── Brand ── -->
+<nav class="fixed top-0 left-0 z-40 flex h-screen w-64 flex-col items-start justify-between overflow-hidden bg-[#f3f3fe] px-0 py-8 shadow-[24px_8px_24px_#131b230a]" aria-label="Navigation principale">
   <div class="flex items-center gap-3 pt-0 pb-10 px-6 self-stretch w-full">
     <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0" style="background-color: #004ac6;">
       <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
@@ -12,107 +8,49 @@
       <p class="text-[10px] uppercase tracking-widest text-[#434655] opacity-70">Academic Management</p>
     </div>
   </div>
-
-  <!-- ── Nav links ── -->
   <div class="relative flex-1 self-stretch w-full grow">
-
-    <!-- Dashboard -->
-    <a
-      routerLink="/etudiant/dashboard"
-      routerLinkActive="bg-[#dbe1ff] rounded-lg"
-      [routerLinkActiveOptions]="{ exact: true }"
-      #dashboardRla="routerLinkActive"
-      class="w-[calc(100%_-_32px)] absolute top-0 left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
-      [ngClass]="dashboardRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+    <a routerLink="/etudiant/dashboard" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #dashboardRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-0 left-4 flex items-center gap-2.5 px-4 py-3 no-underline" [ngClass]="dashboardRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
       <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
         <app-icon-dashboard></app-icon-dashboard>
       </div>
-      <span
-        class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap"
-        [ngClass]="dashboardRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
+      <span class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap" [ngClass]="dashboardRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
         Tableau de bord
       </span>
     </a>
-
-    <!-- Étudiants -->
-    <a
-      routerLink="/etudiant/students"
-      routerLinkActive="bg-[#dbe1ff] rounded-lg"
-      [routerLinkActiveOptions]="{ exact: true }"
-      #studentsRla="routerLinkActive"
-      class="w-[calc(100%_-_32px)] absolute top-[52px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
-      [ngClass]="studentsRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+    <a routerLink="/etudiant/students" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #studentsRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[52px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline" [ngClass]="studentsRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
       <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
         <app-icon-etudiant></app-icon-etudiant>
       </div>
-      <span
-        class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap"
-        [ngClass]="studentsRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
+      <span class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap" [ngClass]="studentsRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
         Étudiants
       </span>
     </a>
-
-    <!-- Matières -->
-    <a
-      routerLink="/etudiant/matieres"
-      routerLinkActive="bg-[#dbe1ff] rounded-lg"
-      [routerLinkActiveOptions]="{ exact: true }"
-      #matieresRla="routerLinkActive"
-      class="w-[calc(100%_-_32px)] absolute top-[104px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
-      [ngClass]="matieresRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+    <a routerLink="/etudiant/matieres" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #matieresRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[104px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline" [ngClass]="matieresRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
       <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
         <app-icon-matieres></app-icon-matieres>
       </div>
-      <span
-        class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap"
-        [ngClass]="matieresRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
+      <span class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap" [ngClass]="matieresRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
         Matières
       </span>
     </a>
-
-    <!-- Notes -->
-    <a
-      routerLink="/etudiant/notes"
-      routerLinkActive="bg-[#dbe1ff] rounded-lg"
-      [routerLinkActiveOptions]="{ exact: true }"
-      #notesRla="routerLinkActive"
-      class="w-[calc(100%_-_32px)] absolute top-[156px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
-      [ngClass]="notesRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+    <a routerLink="/etudiant/notes" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #notesRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[156px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline" [ngClass]="notesRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
       <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
         <app-icon-notes></app-icon-notes>
       </div>
-      <span
-        class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap"
-        [ngClass]="notesRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
+      <span class="[font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap" [ngClass]="notesRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
         Notes
       </span>
     </a>
-
   </div>
-
-  <!-- ── Footer (Paramètres + Déconnexion) ── -->
   <div class="flex flex-col items-start gap-1 pt-8 pb-0 px-4 relative self-stretch w-full flex-[0_0_auto] border-t [border-top-style:solid] border-[#c3c6d726]">
-    <a
-      href="#"
-      class="relative self-stretch w-full flex-[0_0_auto] flex items-center px-4 py-3 no-underline">
-      <img
-        class="relative flex-[0_0_auto]"
-        src="https://c.animaapp.com/mnbnobg3lUYjRB/img/margin-4.svg"
-        alt=""
-        aria-hidden="true" />
+    <a href="#" class="relative self-stretch w-full flex-[0_0_auto] flex items-center px-4 py-3 no-underline">
+      <img class="relative flex-[0_0_auto]" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/margin-4.svg" alt="" aria-hidden="true" />
       <span class="[font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap ml-2">
         Paramètres
       </span>
     </a>
-    <button
-      type="button"
-      (click)="onLogout()"
-      class="all-[unset] box-border relative self-stretch w-full flex-[0_0_auto] flex items-center px-4 py-3 cursor-pointer">
-      <img
-        class="relative flex-[0_0_auto]"
-        src="https://c.animaapp.com/mnbnobg3lUYjRB/img/margin-3.svg"
-        alt=""
-        aria-hidden="true" />
+    <button type="button" (click)="onLogout()" class="all-[unset] box-border relative self-stretch w-full flex-[0_0_auto] flex items-center px-4 py-3 cursor-pointer">
+      <img class="relative flex-[0_0_auto]" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/margin-3.svg"alt="" aria-hidden="true" />
       <span class="[font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap ml-2">
         Déconnexion
       </span>
