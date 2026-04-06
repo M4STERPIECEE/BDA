@@ -13,6 +13,7 @@ import { EtudiantTopbarComponent } from './pages/etudiant/components/etudiant-to
 import { EtudiantDashboardContentComponent } from './pages/etudiant/components/etudiant-dashboard-content/etudiant-dashboard-content.component';
 import { EtudiantStudentsContentComponent } from './pages/etudiant/components/etudiant-students-content/etudiant-students-content.component';
 import { EtudiantSubjectsContentComponent } from './pages/etudiant/components/etudiant-subjects-content/etudiant-subjects-content.component';
+import { EtudiantGradeContentComponent } from './pages/etudiant/components/etudiant-grade-content/etudiant-grade-content.component';
 import { DashboardIconComponent } from './icons/dashboard-icon.component';
 import { EtudiantIconComponent } from './icons/etudiant-icon.component';
 import { MatieresIconComponent } from './icons/matieres-icon.component';
@@ -31,6 +32,7 @@ import { routes } from './app.routes';
     EtudiantDashboardContentComponent,
     EtudiantStudentsContentComponent,
     EtudiantSubjectsContentComponent,
+    EtudiantGradeContentComponent,
   ],
   imports: [
     BrowserModule,
