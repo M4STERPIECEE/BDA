@@ -50,18 +50,26 @@
         </span>
       </div>
     </a>
-    <a href="#" class="w-[calc(100%_-_32px)] absolute top-[156px] left-4 flex items-center px-4 py-3 no-underline">
-      <app-icon-notes></app-icon-notes>
+    <a [routerLink]="['/etudiant', 'notes']" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #notesRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-[156px] left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
+      [ngClass]="notesRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+      <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
+        <app-icon-notes></app-icon-notes>
+      </div>
       <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <span class="relative w-[39.44px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
+        <span class="relative w-[39.44px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center"
+          [ngClass]="notesRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
           Notes
         </span>
       </div>
     </a>
-    <a href="#" class="w-[calc(100%_-_32px)] absolute top-52 left-4 flex items-center px-4 py-3 no-underline">
-      <app-icon-audit></app-icon-audit>
+    <a [routerLink]="['/etudiant', 'audit']" routerLinkActive="bg-[#dbe1ff] rounded-lg" [routerLinkActiveOptions]="{ exact: true }" #auditRla="routerLinkActive" class="w-[calc(100%_-_32px)] absolute top-52 left-4 flex items-center gap-2.5 px-4 py-3 no-underline"
+      [ngClass]="auditRla.isActive ? 'text-[#004ac6]' : 'text-[#434655]'">
+      <div class="relative h-6 w-9 shrink-0 flex items-center justify-center">
+        <app-icon-audit></app-icon-audit>
+      </div>
       <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <span class="relative w-[35.3px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-[#434655] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center">
+        <span class="relative w-[35.3px] h-5 mt-[-1.00px] [font-family:'Inter',Helvetica] text-sm tracking-[0] leading-5 whitespace-nowrap flex items-center"
+          [ngClass]="auditRla.isActive ? 'font-bold text-[#004ac6]' : 'font-medium text-[#434655]'">
           Audit
         </span>
       </div>

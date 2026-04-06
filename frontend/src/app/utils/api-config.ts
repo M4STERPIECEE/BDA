@@ -12,5 +12,11 @@ export const API_ENDPOINTS = {
   subjects: {
     list: `${API_BASE_URL}/${API_VERSION}/subjects`,
   },
+  grades: {
+    list: `${API_BASE_URL}/${API_VERSION}/grades`,
+  },
+  audit: {
+    list: `${API_BASE_URL}/${API_VERSION}/audit`,
+  },
 } as const;
 
