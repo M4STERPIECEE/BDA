@@ -1,13 +1,14 @@
 <main class="grades-page px-8 pb-14 pt-5">
+  <!-- ── Header ── -->
   <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end">
     <div>
       <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
         <span class="crumb-muted">Curator</span>
         <span class="crumb-sep">›</span>
-        <span class="crumb-active">Notes & Audit</span>
+        <span class="crumb-active">Notes</span>
       </nav>
       <h2 class="page-title">Gestion des Notes</h2>
-      <p class="page-subtitle">Insertion, modification, suppression des notes et supervision des operations.</p>
+      <p class="page-subtitle">Insertion, modification et suppression des notes étudiants.</p>
     </div>
     <button class="btn-primary" type="button" (click)="openCreateModal()">
       <span class="material-symbols-outlined">post_add</span>
@@ -15,6 +16,7 @@
     </button>
   </div>
 
+  <!-- ── KPI Cards ── -->
   <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
     <div class="kpi-card">
       <p class="kpi-label">Total Notes</p>
@@ -25,16 +27,17 @@
       <h3 class="kpi-value">{{ globalAverage | number:'1.2-2' }}/20</h3>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Etudiants</p>
+      <p class="kpi-label">Étudiants</p>
       <h3 class="kpi-value">{{ totalStudents }}</h3>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Matieres</p>
+      <p class="kpi-label">Matières</p>
       <h3 class="kpi-value">{{ totalSubjects }}</h3>
     </div>
   </div>
 
-  <section class="table-card mb-6">
+  <!-- ── Notes Table ── -->
+  <section class="table-card">
     <div class="table-toolbar">
       <p class="toolbar-title">Table des notes</p>
       <div class="toolbar-actions flex items-center gap-3">
@@ -42,12 +45,17 @@
           <span class="material-symbols-outlined search-icon">search</span>
           <input
             class="search-input"
-            placeholder="Rechercher etudiant/matiere..."
+            placeholder="Rechercher étudiant / matière..."
             type="text"
             [value]="searchTerm"
             (input)="onSearchChange(($any($event.target).value ?? '').toString())" />
         </div>
-        <button class="refresh-btn" type="button" (click)="refreshAll()" [disabled]="loadingGrades || loadingAudit" title="Actualiser">
+        <button
+          class="refresh-btn"
+          type="button"
+          (click)="refreshAll()"
+          [disabled]="loadingGrades"
+          title="Actualiser">
           <span class="material-symbols-outlined">refresh</span>
         </button>
       </div>
@@ -57,148 +65,150 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>N Etudiant</th>
+            <th>N° Étudiant</th>
             <th>Nom</th>
-            <th>N Matiere</th>
-            <th>Designation</th>
-            <th class="text-center">Note</th>
+            <th>N° Matière</th>
+            <th>Désignation</th>
+            <th class="text-center">Note /20</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
 
+        <!-- Data rows -->
         <tbody *ngIf="!loadingGrades && !gradesErrorMessage">
-          <tr *ngFor="let grade of displayedGrades; let i = index" class="data-row" [style.animation-delay]="i * 30 + 'ms'">
+          <tr
+            *ngFor="let grade of displayedGrades; let i = index"
+            class="data-row"
+            [style.animation-delay]="i * 30 + 'ms'">
             <td><span class="student-id">{{ grade.studentId }}</span></td>
             <td>{{ grade.studentName }}</td>
             <td>{{ grade.subjectId }}</td>
             <td>{{ grade.subjectLabel }}</td>
             <td class="text-center">
-              <span class="avg-badge" [class.avg-bad]="grade.value < 10" [class.avg-good]="grade.value >= 10">
+              <span
+                class="avg-badge"
+                [class.avg-bad]="grade.value < 10"
+                [class.avg-good]="grade.value >= 10">
                 {{ grade.value | number:'1.2-2' }}
               </span>
             </td>
             <td class="text-right">
               <div class="row-actions">
-                <button class="action-btn action-edit" type="button" title="Modifier" (click)="openEditModal(grade)">
+                <button
+                  class="action-btn action-edit"
+                  type="button"
+                  title="Modifier"
+                  (click)="openEditModal(grade)">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button class="action-btn action-delete" type="button" title="Supprimer" (click)="deleteGrade(grade)">
+                <button
+                  class="action-btn action-delete"
+                  type="button"
+                  title="Supprimer"
+                  (click)="deleteGrade(grade)">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
             </td>
           </tr>
           <tr *ngIf="displayedGrades.length === 0">
-            <td class="state-cell" colspan="6">Aucune note trouvee.</td>
+            <td class="state-cell" colspan="6">Aucune note trouvée.</td>
           </tr>
         </tbody>
 
+        <!-- Loading -->
         <tbody *ngIf="loadingGrades">
           <tr>
-            <td class="state-cell" colspan="6">Chargement des notes...</td>
+            <td class="state-cell" colspan="6">
+              <div class="loading-wrap">
+                <span class="loading-spinner"></span>
+                Chargement des notes...
+              </div>
+            </td>
           </tr>
         </tbody>
 
+        <!-- Error -->
         <tbody *ngIf="!loadingGrades && gradesErrorMessage">
           <tr>
-            <td class="state-cell" colspan="6">{{ gradesErrorMessage }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="table-card" id="audit-table">
-    <div class="table-toolbar">
-      <p class="toolbar-title">Audit des operations sur les notes</p>
-    </div>
-
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Operation</th>
-            <th>Date</th>
-            <th>N Etudiant</th>
-            <th>Nom</th>
-            <th>Matiere</th>
-            <th class="text-center">Ancienne</th>
-            <th class="text-center">Nouvelle</th>
-            <th>Utilisateur</th>
-          </tr>
-        </thead>
-
-        <tbody *ngIf="!loadingAudit && !auditErrorMessage">
-          <tr *ngFor="let audit of auditEntries; trackBy: trackAuditById" class="data-row">
-            <td>
-              <span
-                class="op-badge"
-                [ngClass]="{
-                  'op-insert': audit.operationType === 'INSERT',
-                  'op-update': audit.operationType === 'UPDATE',
-                  'op-delete': audit.operationType === 'DELETE'
-                }">
-                {{ audit.operationType }}
-              </span>
+            <td class="state-cell error-cell" colspan="6">
+              <span class="material-symbols-outlined">error</span>
+              {{ gradesErrorMessage }}
             </td>
-            <td>{{ audit.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-            <td>{{ audit.studentId }}</td>
-            <td>{{ audit.studentName }}</td>
-            <td>{{ audit.subjectLabel }}</td>
-            <td class="text-center">{{ formatNote(audit.oldValue) }}</td>
-            <td class="text-center">{{ formatNote(audit.newValue) }}</td>
-            <td>{{ audit.dbUser }}</td>
-          </tr>
-          <tr *ngIf="auditEntries.length === 0">
-            <td class="state-cell" colspan="8">Aucune entree d'audit trouvee.</td>
-          </tr>
-        </tbody>
-
-        <tbody *ngIf="loadingAudit">
-          <tr>
-            <td class="state-cell" colspan="8">Chargement de l'audit...</td>
-          </tr>
-        </tbody>
-
-        <tbody *ngIf="!loadingAudit && auditErrorMessage">
-          <tr>
-            <td class="state-cell" colspan="8">{{ auditErrorMessage }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="table-footer">
+    <!-- Table footer: row count -->
+    <div class="table-footer" *ngIf="!loadingGrades && !gradesErrorMessage">
       <p class="footer-count">
-        Insertions: {{ auditStats.insertCount }} |
-        Modifications: {{ auditStats.updateCount }} |
-        Suppressions: {{ auditStats.deleteCount }}
+        {{ displayedGrades.length }} note(s) affichée(s)
+        <span *ngIf="searchTerm"> — filtrée(s) sur « {{ searchTerm }} »</span>
       </p>
     </div>
   </section>
 
+  <!-- ── Modal Add / Edit ── -->
   <div *ngIf="isModalOpen" class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Enregistrer une note" (click)="$event.stopPropagation()">
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="editingGrade ? 'Modifier une note' : 'Ajouter une note'"
+      (click)="$event.stopPropagation()">
+
       <div class="modal-header">
         <h3>{{ editingGrade ? 'Modifier une note' : 'Ajouter une note' }}</h3>
-        <button class="modal-close" type="button" (click)="closeModal()" [disabled]="isSubmitting" aria-label="Fermer">
+        <button
+          class="modal-close"
+          type="button"
+          (click)="closeModal()"
+          [disabled]="isSubmitting"
+          aria-label="Fermer">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
 
       <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()" class="modal-form">
-        <label for="studentId" class="modal-label">Etudiant</label>
-        <select id="studentId" class="modal-input" formControlName="studentId" [attr.disabled]="editingGrade ? '' : null">
-          <option [ngValue]="0">Choisir un etudiant</option>
-          <option *ngFor="let student of students" [ngValue]="student.studentId">{{ student.fullName }}</option>
-        </select>
 
-        <label for="subjectId" class="modal-label">Matiere</label>
-        <select id="subjectId" class="modal-input" formControlName="subjectId" [attr.disabled]="editingGrade ? '' : null">
-          <option [ngValue]="0">Choisir une matiere</option>
-          <option *ngFor="let subject of subjects" [ngValue]="subject.subjectId">{{ subject.label }}</option>
+        <!-- Étudiant -->
+        <label for="studentId" class="modal-label">Étudiant</label>
+        <select
+          id="studentId"
+          class="modal-input"
+          formControlName="studentId"
+          [class.modal-input-error]="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched">
+          <option [ngValue]="0" disabled>Choisir un étudiant</option>
+          <option *ngFor="let student of students" [ngValue]="student.studentId">
+            {{ student.fullName }}
+          </option>
         </select>
+        <p
+          *ngIf="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched"
+          class="modal-error">
+          Veuillez sélectionner un étudiant.
+        </p>
 
+        <!-- Matière -->
+        <label for="subjectId" class="modal-label">Matière</label>
+        <select
+          id="subjectId"
+          class="modal-input"
+          formControlName="subjectId"
+          [class.modal-input-error]="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched">
+          <option [ngValue]="0" disabled>Choisir une matière</option>
+          <option *ngFor="let subject of subjects" [ngValue]="subject.subjectId">
+            {{ subject.label }}
+          </option>
+        </select>
+        <p
+          *ngIf="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched"
+          class="modal-error">
+          Veuillez sélectionner une matière.
+        </p>
+
+        <!-- Note -->
         <label for="value" class="modal-label">Note (/20)</label>
         <input
           id="value"
@@ -208,16 +218,25 @@
           min="0"
           max="20"
           step="0.01"
-          placeholder="Ex: 14.5"
+          placeholder="Ex : 14.50"
           [class.modal-input-error]="gradeForm.controls.value.invalid && gradeForm.controls.value.touched" />
-        <p *ngIf="gradeForm.controls.value.invalid && gradeForm.controls.value.touched" class="modal-error">
-          La note doit etre comprise entre 0 et 20.
+        <p
+          *ngIf="gradeForm.controls.value.invalid && gradeForm.controls.value.touched"
+          class="modal-error">
+          La note doit être comprise entre 0 et 20.
         </p>
 
+        <!-- Server error -->
         <p *ngIf="modalErrorMessage" class="modal-error">{{ modalErrorMessage }}</p>
 
         <div class="modal-actions">
-          <button class="btn-secondary" type="button" (click)="closeModal()" [disabled]="isSubmitting">Annuler</button>
+          <button
+            class="btn-secondary"
+            type="button"
+            (click)="closeModal()"
+            [disabled]="isSubmitting">
+            Annuler
+          </button>
           <button class="btn-primary" type="submit" [disabled]="isSubmitting">
             <span *ngIf="isSubmitting" class="btn-spinner" aria-hidden="true"></span>
             <span *ngIf="!isSubmitting" class="material-symbols-outlined">save</span>

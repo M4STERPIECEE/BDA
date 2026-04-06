@@ -11,6 +11,6 @@ public record LoginRequest(
         String password,
 
         @NotBlank(message = "Role is required")
-        @Pattern(regexp = "ADMIN|ETUDIANT", message = "Role must be ADMIN or ETUDIANT")
+        @Pattern(regexp = "ADMIN|ETUDIANT|GESTIONNAIRE", message = "Role must be ADMIN, ETUDIANT or GESTIONNAIRE")
         String role
 ) {}

@@ -2,11 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { AuditEntry, AuditStats } from '../../../../models/audit.model';
 import { Grade } from '../../../../models/grade.model';
 import { Student } from '../../../../models/student.model';
 import { Subject } from '../../../../models/subject.model';
-import { AuditService } from '../../../../services/audit.service';
 import { GradeService } from '../../../../services/grade.service';
 import { StudentService } from '../../../../services/student.service';
 import { SubjectService } from '../../../../services/subject.service';
@@ -27,22 +25,12 @@ export class EtudiantGradeContentComponent implements OnInit {
   readonly gradeForm;
 
   grades: Grade[] = [];
-  auditEntries: AuditEntry[] = [];
-  auditStats: AuditStats = {
-    insertCount: 0,
-    updateCount: 0,
-    deleteCount: 0,
-    totalCount: 0,
-  };
-
   students: Student[] = [];
   subjects: Subject[] = [];
 
   loadingGrades = true;
-  loadingAudit = true;
   searchTerm = '';
   gradesErrorMessage = '';
-  auditErrorMessage = '';
 
   isModalOpen = false;
   isSubmitting = false;
@@ -56,14 +44,16 @@ export class EtudiantGradeContentComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly gradeService: GradeService,
-    private readonly auditService: AuditService,
     private readonly studentService: StudentService,
     private readonly subjectService: SubjectService,
   ) {
     this.gradeForm = this.formBuilder.nonNullable.group({
       studentId: [0, [Validators.required, Validators.min(1)]],
       subjectId: [0, [Validators.required, Validators.min(1)]],
-      value: [0, [Validators.required, Validators.min(0), Validators.max(20)]],
+      value: [
+        0,
+        [Validators.required, Validators.min(0), Validators.max(20)],
+      ],
     });
   }
 
@@ -73,20 +63,14 @@ export class EtudiantGradeContentComponent implements OnInit {
 
   get displayedGrades(): Grade[] {
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) {
-      return this.grades;
-    }
+    if (!term) return this.grades;
 
-    return this.grades.filter((grade) => {
-      const studentId = String(grade.studentId).toLowerCase();
-      const studentName = (grade.studentName ?? '').toLowerCase();
-      const subjectId = String(grade.subjectId).toLowerCase();
-      const subjectLabel = (grade.subjectLabel ?? '').toLowerCase();
+    return this.grades.filter((g) => {
       return (
-        studentId.includes(term) ||
-        studentName.includes(term) ||
-        subjectId.includes(term) ||
-        subjectLabel.includes(term)
+        String(g.studentId).toLowerCase().includes(term) ||
+        (g.studentName ?? '').toLowerCase().includes(term) ||
+        String(g.subjectId).toLowerCase().includes(term) ||
+        (g.subjectLabel ?? '').toLowerCase().includes(term)
       );
     });
   }
@@ -97,8 +81,7 @@ export class EtudiantGradeContentComponent implements OnInit {
 
   refreshAll(): void {
     this.loadGrades();
-    this.loadAudit();
-    this.loadStats();
+    this.loadRefData();
   }
 
   openCreateModal(): void {
@@ -124,11 +107,11 @@ export class EtudiantGradeContentComponent implements OnInit {
   }
 
   closeModal(): void {
-    if (this.isSubmitting) {
-      return;
-    }
+    if (this.isSubmitting) return;
     this.isModalOpen = false;
     this.modalErrorMessage = '';
+    this.gradeForm.controls.studentId.enable();
+    this.gradeForm.controls.subjectId.enable();
   }
 
   submitGrade(): void {
@@ -137,15 +120,15 @@ export class EtudiantGradeContentComponent implements OnInit {
       return;
     }
 
-    const formValue = this.gradeForm.getRawValue() as GradeFormValue;
+    const raw = this.gradeForm.getRawValue() as GradeFormValue;
     const payload = {
-      studentId: Number(formValue.studentId),
-      subjectId: Number(formValue.subjectId),
-      value: Number(formValue.value),
+      studentId: Number(raw.studentId),
+      subjectId: Number(raw.subjectId),
+      value: Number(raw.value),
     };
 
     if (!Number.isFinite(payload.value) || payload.value < 0 || payload.value > 20) {
-      this.modalErrorMessage = 'La note doit etre comprise entre 0 et 20.';
+      this.modalErrorMessage = 'La note doit être comprise entre 0 et 20.';
       return;
     }
 
@@ -157,30 +140,27 @@ export class EtudiantGradeContentComponent implements OnInit {
         .updateGrade(this.editingGrade.studentId, this.editingGrade.subjectId, payload)
         .subscribe({
           next: () => this.onSubmitSuccess(),
-          error: (error: HttpErrorResponse) => this.onSubmitError(error),
+          error: (err: HttpErrorResponse) => this.onSubmitError(err),
         });
       return;
     }
 
     this.gradeService.createGrade(payload).subscribe({
       next: () => this.onSubmitSuccess(),
-      error: (error: HttpErrorResponse) => this.onSubmitError(error),
+      error: (err: HttpErrorResponse) => this.onSubmitError(err),
     });
   }
 
   deleteGrade(grade: Grade): void {
     const confirmed = window.confirm(
-      `Supprimer la note de ${grade.studentName} pour ${grade.subjectLabel} ?`,
+      `Supprimer la note de ${grade.studentName} en ${grade.subjectLabel} ?`,
     );
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     this.gradeService.deleteGrade(grade.studentId, grade.subjectId).subscribe({
       next: () => {
         this.loadGrades();
-        this.loadAudit();
-        this.loadStats();
+        this.loadRefData();
       },
       error: () => {
         this.gradesErrorMessage = 'Impossible de supprimer la note.';
@@ -188,20 +168,8 @@ export class EtudiantGradeContentComponent implements OnInit {
     });
   }
 
-  formatNote(value: number | null | undefined): string {
-    if (value === null || value === undefined || Number.isNaN(Number(value))) {
-      return '-';
-    }
-    return Number(value).toFixed(2);
-  }
-
-  trackAuditById(_: number, item: AuditEntry): number {
-    return item.auditId;
-  }
-
   private loadInitialData(): void {
     this.loadingGrades = true;
-    this.loadingAudit = true;
 
     forkJoin({
       studentStats: this.studentService.getStudentStats(),
@@ -220,17 +188,43 @@ export class EtudiantGradeContentComponent implements OnInit {
           this.subjects = Array.isArray(subjectsResponse.content)
             ? subjectsResponse.content
             : [];
-          this.totalSubjects = Number(subjectsResponse.totalElements ?? this.subjects.length);
+          this.totalSubjects = Number(
+            subjectsResponse.totalElements ?? this.subjects.length,
+          );
         }
       },
       error: () => {
-        this.gradesErrorMessage = 'Impossible de charger les donnees de reference.';
+        this.gradesErrorMessage = 'Impossible de charger les données de référence.';
       },
     });
 
     this.loadGrades();
-    this.loadAudit();
-    this.loadStats();
+  }
+
+  private loadRefData(): void {
+    forkJoin({
+      studentStats: this.studentService.getStudentStats(),
+      students: this.studentService.getStudents(0, 200),
+      subjectsResponse: this.subjectService.getSubjects(0, 200),
+    }).subscribe({
+      next: ({ studentStats, students, subjectsResponse }) => {
+        this.totalStudents = Number(studentStats.totalStudents ?? 0);
+        this.globalAverage = Number(studentStats.globalAverage ?? 0);
+        this.students = Array.isArray(students.content) ? students.content : [];
+
+        if (Array.isArray(subjectsResponse)) {
+          this.subjects = subjectsResponse;
+          this.totalSubjects = subjectsResponse.length;
+        } else {
+          this.subjects = Array.isArray(subjectsResponse.content)
+            ? subjectsResponse.content
+            : [];
+          this.totalSubjects = Number(
+            subjectsResponse.totalElements ?? this.subjects.length,
+          );
+        }
+      },
+    });
   }
 
   private loadGrades(): void {
@@ -250,52 +244,6 @@ export class EtudiantGradeContentComponent implements OnInit {
     });
   }
 
-  private loadAudit(): void {
-    this.loadingAudit = true;
-    this.auditErrorMessage = '';
-
-    this.auditService.getAuditEntries().subscribe({
-      next: (entries) => {
-        this.auditEntries = Array.isArray(entries) ? entries : [];
-        this.loadingAudit = false;
-      },
-      error: (error: HttpErrorResponse) => {
-        this.auditEntries = [];
-        this.loadingAudit = false;
-        if (error.status === 403) {
-          this.auditErrorMessage = 'Audit reserve au role ADMIN.';
-          return;
-        }
-        this.auditErrorMessage = 'Impossible de charger les traces d\'audit.';
-      },
-    });
-  }
-
-  private loadStats(): void {
-    this.auditService.getAuditStats().subscribe({
-      next: (stats) => {
-        this.auditStats = {
-          insertCount: Number(stats.insertCount ?? 0),
-          updateCount: Number(stats.updateCount ?? 0),
-          deleteCount: Number(stats.deleteCount ?? 0),
-          totalCount: Number(stats.totalCount ?? 0),
-        };
-      },
-      error: (error: HttpErrorResponse) => {
-        this.auditStats = {
-          insertCount: 0,
-          updateCount: 0,
-          deleteCount: 0,
-          totalCount: 0,
-        };
-
-        if (error.status === 403) {
-          this.auditErrorMessage = 'Audit reserve au role ADMIN.';
-        }
-      },
-    });
-  }
-
   private onSubmitSuccess(): void {
     this.isSubmitting = false;
     this.isModalOpen = false;
@@ -303,23 +251,21 @@ export class EtudiantGradeContentComponent implements OnInit {
     this.gradeForm.controls.studentId.enable();
     this.gradeForm.controls.subjectId.enable();
     this.loadGrades();
-    this.loadAudit();
-    this.loadStats();
+    this.loadRefData();
   }
 
   private onSubmitError(error: HttpErrorResponse): void {
     this.isSubmitting = false;
 
     if (error.status === 409) {
-      this.modalErrorMessage = 'Cette note existe deja pour cet etudiant et cette matiere.';
+      this.modalErrorMessage =
+        'Cette note existe déjà pour cet étudiant et cette matière.';
       return;
     }
-
     if (error.status === 400) {
-      this.modalErrorMessage = 'La note doit etre comprise entre 0 et 20.';
+      this.modalErrorMessage = 'La note doit être comprise entre 0 et 20.';
       return;
     }
-
-    this.modalErrorMessage = 'Impossible d\'enregistrer la note.';
+    this.modalErrorMessage = "Impossible d'enregistrer la note.";
   }
 }

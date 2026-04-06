@@ -53,7 +53,10 @@ public class AuthController {
 
     private String toBusinessRole(String role) {
         if ("USER".equalsIgnoreCase(role)) {
-            return "ETUDIANT";
+            return "GESTIONNAIRE";
+        }
+        if ("GESTIONNAIRE".equalsIgnoreCase(role)) {
+            return "GESTIONNAIRE";
         }
         return role.toUpperCase();
     }

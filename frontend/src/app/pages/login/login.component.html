@@ -33,8 +33,8 @@
             </button>
             @if (isRoleDropdownOpen) {
               <div class="dropdown-panel" role="listbox" aria-labelledby="role-label">
-                <button type="button" class="dropdown-option" [class.active]="loginForm.controls.role.value === 'ETUDIANT'" (click)="selectRole('ETUDIANT')">
-                  Student
+                <button type="button" class="dropdown-option" [class.active]="loginForm.controls.role.value === 'GESTIONNAIRE'" (click)="selectRole('GESTIONNAIRE')">
+                  Gestionnaire
                 </button>
                 <button type="button" class="dropdown-option" [class.active]="loginForm.controls.role.value === 'ADMIN'" (click)="selectRole('ADMIN')" >
                   Admin

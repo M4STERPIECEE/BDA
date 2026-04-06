@@ -19,7 +19,7 @@ export class LoginComponent {
   readonly loginForm = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required]],
-    role: ['ETUDIANT' as UserRole, [Validators.required]],
+    role: ['GESTIONNAIRE' as UserRole, [Validators.required]],
   });
 
   showError = false;
@@ -46,7 +46,8 @@ export class LoginComponent {
   }
 
   get selectedRoleLabel(): string {
-    return this.loginForm.controls.role.value === 'ADMIN' ? 'Admin' : 'Student';
+    const role = this.loginForm.controls.role.value;
+    return role === 'ADMIN' ? 'Admin' : role === 'GESTIONNAIRE' ? 'Gestionnaire' : 'Etudiant';
   }
 
   @HostListener('document:click', ['$event'])
@@ -83,9 +84,10 @@ export class LoginComponent {
   private redirectByRole(response: AuthResponse): void {
     this.isLoading = false;
     if (response.role === 'ADMIN') {
-      this.router.navigate(['/admin']);
+      this.router.navigate(['/admin'], { replaceUrl: true });
       return;
     }
-    this.router.navigate(['/etudiant']);
+
+    this.router.navigate(['/etudiant'], { replaceUrl: true });
   }
 }

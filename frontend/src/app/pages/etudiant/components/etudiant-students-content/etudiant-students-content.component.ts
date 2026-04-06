@@ -59,7 +59,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   readonly studentForm;
 
   readonly tableHeaders: TableHeader[] = [
-    { label: 'ID étudiant' },
+    { label: 'N° étudiant' },
     { label: 'Nom complet' },
     { label: 'Moyenne (/20)', className: 'text-center' },
     { label: 'Actions', className: 'text-right' },
