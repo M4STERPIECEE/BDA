@@ -14,6 +14,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './admin.component.css',
 })
 export class AdminComponent {
+  username = 'ADMIN';
+  status = 'ADMIN';
   auditEntries: AuditEntry[] = [];
   auditStats: AuditStats = {
     insertCount: 0,
@@ -25,6 +27,7 @@ export class AdminComponent {
   errorMessage = '';
   filterType: 'ALL' | 'INSERT' | 'UPDATE' | 'DELETE' = 'ALL';
   selectedAudit: AuditEntry | null = null;
+  isLogoutModalOpen = false;
 
   constructor(
     private readonly authService: AuthService,
@@ -33,12 +36,22 @@ export class AdminComponent {
   ) {}
 
   ngOnInit(): void {
+    this.loadIdentity();
     this.loadDashboard();
+  }
+
+  openLogoutModal(): void {
+    this.isLogoutModalOpen = true;
+  }
+
+  closeLogoutModal(): void {
+    this.isLogoutModalOpen = false;
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.isLogoutModalOpen = false;
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   setFilter(type: 'ALL' | 'INSERT' | 'UPDATE' | 'DELETE'): void {
@@ -76,6 +89,14 @@ export class AdminComponent {
 
   get recentEntries(): AuditEntry[] {
     return [...this.filteredEntries].slice(0, 5);
+  }
+
+  private loadIdentity(): void {
+    const storedUsername = localStorage.getItem('bda_username');
+    const storedRole = localStorage.getItem('bda_role');
+
+    this.username = storedUsername && storedUsername.trim().length > 0 ? storedUsername : 'ADMIN';
+    this.status = storedRole && storedRole.trim().length > 0 ? storedRole.toUpperCase() : 'ADMIN';
   }
 
   private loadDashboard(): void {

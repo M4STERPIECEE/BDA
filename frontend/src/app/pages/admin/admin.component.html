@@ -1,5 +1,48 @@
-<main class="admin-page px-8 pb-14 pt-5">
-  <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+<div class="admin-shell relative min-h-screen bg-[#faf8ff]">
+  <aside class="admin-sidebar" aria-label="Navigation admin">
+    <div class="brand-block">
+      <h2>Curator</h2>
+      <p>Administration & Supervision</p>
+    </div>
+    <nav class="menu-block">
+      <a class="menu-item menu-item-active" href="#top">
+        <span class="material-symbols-outlined">space_dashboard</span>
+        <span>Supervision</span>
+      </a>
+      <a class="menu-item" href="#audit-table">
+        <span class="material-symbols-outlined">fact_check</span>
+        <span>Audit des notes</span>
+      </a>
+      <a class="menu-item" href="#audit-stats">
+        <span class="material-symbols-outlined">monitoring</span>
+        <span>Statistiques</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-side-btn" type="button" (click)="openLogoutModal()">
+        <span class="material-symbols-outlined">logout</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+  <header class="admin-topbar" id="top">
+    <div class="topbar-left">
+      <span class="material-symbols-outlined">shield_person</span>
+      <div>
+        <p class="topbar-title">Espace Administrateur</p>
+        <p class="topbar-subtitle">Surveillance des actions SQL sur les notes</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="identity">
+        <p class="identity-name">{{ username }}</p>
+        <p class="identity-role">{{ status }}</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-page px-8 pb-14 pt-5">
+    <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end">
     <div>
       <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
         <span class="crumb-muted">Curator</span>
@@ -16,27 +59,26 @@
       Actualiser
     </button>
   </div>
+    <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4" id="audit-stats">
+      <div class="kpi-card kpi-blue">
+        <p class="kpi-label">Insertions</p>
+        <h3 class="kpi-value">{{ auditStats.insertCount }}</h3>
+      </div>
+      <div class="kpi-card kpi-violet">
+        <p class="kpi-label">Modifications</p>
+        <h3 class="kpi-value">{{ auditStats.updateCount }}</h3>
+      </div>
+      <div class="kpi-card kpi-red">
+        <p class="kpi-label">Suppressions</p>
+        <h3 class="kpi-value">{{ auditStats.deleteCount }}</h3>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <p class="kpi-label">Total audité</p>
+        <h3 class="kpi-value">{{ auditStats.totalCount }}</h3>
+      </div>
+    </div>
 
-  <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
-    <div class="kpi-card kpi-blue">
-      <p class="kpi-label">Insertions</p>
-      <h3 class="kpi-value">{{ auditStats.insertCount }}</h3>
-    </div>
-    <div class="kpi-card kpi-violet">
-      <p class="kpi-label">Modifications</p>
-      <h3 class="kpi-value">{{ auditStats.updateCount }}</h3>
-    </div>
-    <div class="kpi-card kpi-red">
-      <p class="kpi-label">Suppressions</p>
-      <h3 class="kpi-value">{{ auditStats.deleteCount }}</h3>
-    </div>
-    <div class="kpi-card kpi-blue">
-      <p class="kpi-label">Total audité</p>
-      <h3 class="kpi-value">{{ auditStats.totalCount }}</h3>
-    </div>
-  </div>
-
-  <section class="table-card mb-6">
+    <section class="table-card mb-6" id="audit-table">
     <div class="table-toolbar">
       <p class="toolbar-title">Filtres audit</p>
       <div class="toolbar-actions flex flex-wrap items-center gap-3">
@@ -46,7 +88,6 @@
         <button class="filter-pill" type="button" [class.filter-pill-active]="filterType === 'DELETE'" (click)="setFilter('DELETE')">DELETE</button>
       </div>
     </div>
-
     <div class="table-wrapper">
       <table class="data-table">
         <thead>
@@ -125,11 +166,11 @@
 
     <div class="table-footer">
       <p class="footer-count">{{ filteredEntries.length }} operation(s) affichée(s)</p>
-      <button class="btn-secondary" type="button" (click)="logout()">Se deconnecter</button>
+      <button class="btn-secondary" type="button" (click)="openLogoutModal()">Se deconnecter</button>
     </div>
-  </section>
+    </section>
 
-  <section class="table-card">
+    <section class="table-card">
     <div class="table-toolbar">
       <p class="toolbar-title">Dernières opérations</p>
     </div>
@@ -145,27 +186,47 @@
         Aucune donnée d’audit disponible.
       </div>
     </div>
-  </section>
-
-  <div *ngIf="selectedAudit" class="modal-backdrop" (click)="closeAuditDetails()">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Détails de l'audit" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Détails de l’opération</h3>
-        <button class="modal-close" type="button" (click)="closeAuditDetails()" aria-label="Fermer">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <div class="details-grid">
-        <div><span>Opération</span><strong>{{ selectedAudit.operationType }}</strong></div>
-        <div><span>Date</span><strong>{{ selectedAudit.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</strong></div>
-        <div><span>Étudiant</span><strong>{{ selectedAudit.studentId }} - {{ selectedAudit.studentName }}</strong></div>
-        <div><span>Matière</span><strong>{{ selectedAudit.subjectLabel }}</strong></div>
-        <div><span>Ancienne note</span><strong>{{ formatValue(selectedAudit.oldValue) }}</strong></div>
-        <div><span>Nouvelle note</span><strong>{{ formatValue(selectedAudit.newValue) }}</strong></div>
-        <div><span>Utilisateur</span><strong>{{ selectedAudit.dbUser }}</strong></div>
+    </section>
+    <div *ngIf="selectedAudit" class="modal-backdrop" (click)="closeAuditDetails()">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-label="Détails de l'audit" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Détails de l’opération</h3>
+          <button class="modal-close" type="button" (click)="closeAuditDetails()" aria-label="Fermer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="details-grid">
+          <div><span>Opération</span><strong>{{ selectedAudit.operationType }}</strong></div>
+          <div><span>Date</span><strong>{{ selectedAudit.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</strong></div>
+          <div><span>Étudiant</span><strong>{{ selectedAudit.studentId }} - {{ selectedAudit.studentName }}</strong></div>
+          <div><span>Matière</span><strong>{{ selectedAudit.subjectLabel }}</strong></div>
+          <div><span>Ancienne note</span><strong>{{ formatValue(selectedAudit.oldValue) }}</strong></div>
+          <div><span>Nouvelle note</span><strong>{{ formatValue(selectedAudit.newValue) }}</strong></div>
+          <div><span>Utilisateur</span><strong>{{ selectedAudit.dbUser }}</strong></div>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+
+    <div *ngIf="isLogoutModalOpen" class="modal-backdrop" (click)="closeLogoutModal()">
+      <div class="modal-card logout-modal" role="dialog" aria-modal="true" aria-label="Confirmation de déconnexion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Confirmer la déconnexion</h3>
+          <button class="modal-close" type="button" (click)="closeLogoutModal()" aria-label="Fermer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <p class="logout-modal-text">Voulez-vous vraiment vous déconnecter de l'espace administrateur ?</p>
+
+        <div class="logout-modal-actions">
+          <button class="btn-secondary" type="button" (click)="closeLogoutModal()">Annuler</button>
+          <button class="btn-primary" type="button" (click)="logout()">
+            <span class="material-symbols-outlined">logout</span>
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 

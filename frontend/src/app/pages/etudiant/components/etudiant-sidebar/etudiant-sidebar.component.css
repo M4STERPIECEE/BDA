@@ -2,3 +2,12 @@
   display: contents;
 }
 
+nav[aria-label='Navigation principale'] .relative.flex-1 > a {
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+nav[aria-label='Navigation principale'] .relative.flex-1 > a:hover {
+  background-color: #ececff;
+  border-radius: 0.5rem;
+}
+

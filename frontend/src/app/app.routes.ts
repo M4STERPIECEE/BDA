@@ -7,14 +7,16 @@ import { EtudiantDashboardContentComponent } from './pages/etudiant/components/e
 import { EtudiantStudentsContentComponent } from './pages/etudiant/components/etudiant-students-content/etudiant-students-content.component';
 import { EtudiantSubjectsContentComponent } from './pages/etudiant/components/etudiant-subjects-content/etudiant-subjects-content.component';
 import { EtudiantGradeContentComponent } from './pages/etudiant/components/etudiant-grade-content/etudiant-grade-content.component';
+import { adminGuard, etudiantGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'admin', component: AdminComponent },
+  { path: 'admin', component: AdminComponent, canActivate: [adminGuard] },
   {
     path: 'etudiant',
     component: EtudiantComponent,
+    canActivate: [etudiantGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: EtudiantDashboardContentComponent },

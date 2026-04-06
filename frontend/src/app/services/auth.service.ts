@@ -22,6 +22,16 @@ export class AuthService {
     localStorage.removeItem('bda_role');
   }
 
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('bda_token');
+    return typeof token === 'string' && token.trim().length > 0;
+  }
+
+  hasRole(expectedRole: 'ADMIN' | 'ETUDIANT'): boolean {
+    const role = localStorage.getItem('bda_role');
+    return role?.toUpperCase() === expectedRole;
+  }
+
   private storeSession(response: AuthResponse): void {
     localStorage.setItem('bda_token', response.token);
     localStorage.setItem('bda_username', response.username);
