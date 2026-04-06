@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../utils/api-config';
 import { Grade } from '../models/grade.model';
@@ -10,15 +10,28 @@ interface UpsertGradeRequest {
   value: number;
 }
 
+interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GradeService {
   private readonly apiUrl = API_ENDPOINTS.grades.list;
 
   constructor(private readonly http: HttpClient) {}
 
-  getGrades(): Observable<Grade[]> {
-    return this.http.get<Grade[]>(this.apiUrl, {
+  getGrades(page: number = 0, size: number = 10): Observable<PagedResponse<Grade>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<PagedResponse<Grade>>(this.apiUrl, {
       headers: this.buildAuthHeaders(),
+      params,
     });
   }
 

@@ -54,7 +54,7 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
   statsAverageCoefficient = 0;
   statsLastAudit = '03/04/2026';
   readonly tableHeaders: TableHeader[] = [
-    { label: 'ID Matière' },
+    { label: 'N° Matière' },
     { label: 'Désignation' },
     { label: 'Coefficient', className: 'text-center' },
     { label: 'Actions', className: 'text-right' },
