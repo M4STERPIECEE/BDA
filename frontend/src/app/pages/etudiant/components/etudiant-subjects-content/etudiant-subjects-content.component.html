@@ -126,7 +126,7 @@
 
       <form [formGroup]="subjectForm" (ngSubmit)="submitCreateSubject()" class="modal-form">
         <ng-container *ngIf="editingSubjectId !== null">
-          <label for="subjectId" class="modal-label">ID Matière</label>
+          <label for="subjectId" class="modal-label">N° Matière</label>
           <input id="subjectId" class="modal-input" type="text" [value]="editingSubjectCode" readonly aria-readonly="true" />
         </ng-container>
 

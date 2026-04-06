@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +25,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Grades")
 public class GradeController {
+    private static final int PAGE_SIZE = 10;
+
     private final GradeService gradeService;
 
     @GetMapping
     @Operation(summary = "List grades")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Grades returned", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = GradeResponse.class))))
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Grades returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)))
     })
-    public ResponseEntity<List<GradeResponse>> getAll() {
-        return ResponseEntity.ok(gradeService.findAll());
+    public ResponseEntity<Page<GradeResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        int effectiveSize = size > 0 ? size : PAGE_SIZE;
+        return ResponseEntity.ok(gradeService.findAll(PageRequest.of(page, effectiveSize, Sort.by(Sort.Direction.DESC, "student.studentId"))));
     }
 
     @GetMapping("/student/{studentId}")

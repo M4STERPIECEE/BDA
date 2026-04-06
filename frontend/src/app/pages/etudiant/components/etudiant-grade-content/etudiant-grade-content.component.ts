@@ -15,6 +15,14 @@ interface GradeFormValue {
   value: number;
 }
 
+interface PagedGradeResponse {
+  content: Grade[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 @Component({
   selector: 'app-etudiant-grade-content',
   standalone: false,
@@ -23,6 +31,7 @@ interface GradeFormValue {
 })
 export class EtudiantGradeContentComponent implements OnInit {
   readonly gradeForm;
+  readonly pageSize = 10;
 
   grades: Grade[] = [];
   students: Student[] = [];
@@ -40,6 +49,10 @@ export class EtudiantGradeContentComponent implements OnInit {
   totalStudents = 0;
   totalSubjects = 0;
   globalAverage = 0;
+
+  currentPage = 0;
+  totalPages = 0;
+  totalElements = 0;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -79,8 +92,20 @@ export class EtudiantGradeContentComponent implements OnInit {
     this.searchTerm = value;
   }
 
+  loadPage(page: number): void {
+    if (page < 0 || page >= this.totalPages || page === this.currentPage) {
+      return;
+    }
+    this.loadGrades(page);
+  }
+
+  get pages(): number[] {
+    const visiblePageCount = this.totalPages > 0 ? this.totalPages : (this.grades.length > 0 ? 1 : 0);
+    return Array.from({ length: visiblePageCount }, (_, index) => index);
+  }
+
   refreshAll(): void {
-    this.loadGrades();
+    this.loadGrades(this.currentPage);
     this.loadRefData();
   }
 
@@ -159,7 +184,7 @@ export class EtudiantGradeContentComponent implements OnInit {
 
     this.gradeService.deleteGrade(grade.studentId, grade.subjectId).subscribe({
       next: () => {
-        this.loadGrades();
+    this.loadGrades(this.currentPage);
         this.loadRefData();
       },
       error: () => {
@@ -227,13 +252,16 @@ export class EtudiantGradeContentComponent implements OnInit {
     });
   }
 
-  private loadGrades(): void {
+  private loadGrades(page: number = 0): void {
     this.loadingGrades = true;
     this.gradesErrorMessage = '';
 
-    this.gradeService.getGrades().subscribe({
-      next: (grades) => {
-        this.grades = Array.isArray(grades) ? grades : [];
+    this.gradeService.getGrades(page, this.pageSize).subscribe({
+      next: (response) => {
+        this.grades = Array.isArray(response.content) ? response.content : [];
+        this.currentPage = Number(response.number ?? 0);
+        this.totalPages = Number(response.totalPages ?? 0);
+        this.totalElements = Number(response.totalElements ?? 0);
         this.loadingGrades = false;
       },
       error: () => {
@@ -250,7 +278,7 @@ export class EtudiantGradeContentComponent implements OnInit {
     this.editingGrade = null;
     this.gradeForm.controls.studentId.enable();
     this.gradeForm.controls.subjectId.enable();
-    this.loadGrades();
+    this.loadGrades(this.currentPage);
     this.loadRefData();
   }
 

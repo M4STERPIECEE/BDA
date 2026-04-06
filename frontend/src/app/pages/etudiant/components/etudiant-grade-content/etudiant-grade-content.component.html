@@ -20,7 +20,7 @@
   <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
     <div class="kpi-card">
       <p class="kpi-label">Total Notes</p>
-      <h3 class="kpi-value">{{ grades.length }}</h3>
+      <h3 class="kpi-value">{{ totalElements }}</h3>
     </div>
     <div class="kpi-card">
       <p class="kpi-label">Moyenne Globale</p>
@@ -41,6 +41,10 @@
     <div class="table-toolbar">
       <p class="toolbar-title">Table des notes</p>
       <div class="toolbar-actions flex items-center gap-3">
+        <button class="btn-primary" type="button" (click)="openCreateModal()">
+          <span class="material-symbols-outlined">post_add</span>
+          Ajouter
+        </button>
         <div class="search-wrap">
           <span class="material-symbols-outlined search-icon">search</span>
           <input
@@ -115,8 +119,6 @@
             <td class="state-cell" colspan="6">Aucune note trouvée.</td>
           </tr>
         </tbody>
-
-        <!-- Loading -->
         <tbody *ngIf="loadingGrades">
           <tr>
             <td class="state-cell" colspan="6">
@@ -127,8 +129,6 @@
             </td>
           </tr>
         </tbody>
-
-        <!-- Error -->
         <tbody *ngIf="!loadingGrades && gradesErrorMessage">
           <tr>
             <td class="state-cell error-cell" colspan="6">
@@ -139,102 +139,75 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Table footer: row count -->
     <div class="table-footer" *ngIf="!loadingGrades && !gradesErrorMessage">
       <p class="footer-count">
         {{ displayedGrades.length }} note(s) affichée(s)
         <span *ngIf="searchTerm"> — filtrée(s) sur « {{ searchTerm }} »</span>
       </p>
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="currentPage === 0"
+          (click)="loadPage(currentPage - 1)">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button
+          *ngFor="let page of pages"
+          type="button"
+          class="page-btn"
+          [class.active]="page === currentPage"
+          (click)="loadPage(page)">
+          {{ page + 1 }}
+        </button>
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="currentPage >= totalPages - 1"
+          (click)="loadPage(currentPage + 1)">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
     </div>
   </section>
-
-  <!-- ── Modal Add / Edit ── -->
   <div *ngIf="isModalOpen" class="modal-backdrop" (click)="closeModal()">
-    <div
-      class="modal-card"
-      role="dialog"
-      aria-modal="true"
-      [attr.aria-label]="editingGrade ? 'Modifier une note' : 'Ajouter une note'"
-      (click)="$event.stopPropagation()">
-
+    <div class="modal-backdrop-overlay"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" [attr.aria-label]="editingGrade ? 'Modifier une note' : 'Ajouter une note'" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ editingGrade ? 'Modifier une note' : 'Ajouter une note' }}</h3>
-        <button
-          class="modal-close"
-          type="button"
-          (click)="closeModal()"
-          [disabled]="isSubmitting"
-          aria-label="Fermer">
+        <button class="modal-close" type="button" (click)="closeModal()" [disabled]="isSubmitting" aria-label="Fermer">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-
       <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()" class="modal-form">
-
-        <!-- Étudiant -->
         <label for="studentId" class="modal-label">Étudiant</label>
-        <select
-          id="studentId"
-          class="modal-input"
-          formControlName="studentId"
-          [class.modal-input-error]="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched">
+        <select id="studentId" class="modal-input" formControlName="studentId" [class.modal-input-error]="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched">
           <option [ngValue]="0" disabled>Choisir un étudiant</option>
           <option *ngFor="let student of students" [ngValue]="student.studentId">
             {{ student.fullName }}
           </option>
         </select>
-        <p
-          *ngIf="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched"
-          class="modal-error">
+        <p *ngIf="gradeForm.controls.studentId.invalid && gradeForm.controls.studentId.touched" class="modal-error">
           Veuillez sélectionner un étudiant.
         </p>
-
-        <!-- Matière -->
         <label for="subjectId" class="modal-label">Matière</label>
-        <select
-          id="subjectId"
-          class="modal-input"
-          formControlName="subjectId"
-          [class.modal-input-error]="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched">
+        <select id="subjectId" class="modal-input" formControlName="subjectId" [class.modal-input-error]="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched">
           <option [ngValue]="0" disabled>Choisir une matière</option>
           <option *ngFor="let subject of subjects" [ngValue]="subject.subjectId">
             {{ subject.label }}
           </option>
         </select>
-        <p
-          *ngIf="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched"
-          class="modal-error">
+        <p *ngIf="gradeForm.controls.subjectId.invalid && gradeForm.controls.subjectId.touched" class="modal-error">
           Veuillez sélectionner une matière.
         </p>
-
-        <!-- Note -->
         <label for="value" class="modal-label">Note (/20)</label>
-        <input
-          id="value"
-          class="modal-input"
-          formControlName="value"
-          type="number"
-          min="0"
-          max="20"
-          step="0.01"
-          placeholder="Ex : 14.50"
-          [class.modal-input-error]="gradeForm.controls.value.invalid && gradeForm.controls.value.touched" />
-        <p
-          *ngIf="gradeForm.controls.value.invalid && gradeForm.controls.value.touched"
-          class="modal-error">
+        <input id="value" class="modal-input" formControlName="value" type="number" min="0" max="20" step="0.01" placeholder="Ex : 14.50" [class.modal-input-error]="gradeForm.controls.value.invalid && gradeForm.controls.value.touched" />
+        <p *ngIf="gradeForm.controls.value.invalid && gradeForm.controls.value.touched" class="modal-error">
           La note doit être comprise entre 0 et 20.
         </p>
-
-        <!-- Server error -->
         <p *ngIf="modalErrorMessage" class="modal-error">{{ modalErrorMessage }}</p>
-
         <div class="modal-actions">
-          <button
-            class="btn-secondary"
-            type="button"
-            (click)="closeModal()"
-            [disabled]="isSubmitting">
+          <button class="btn-secondary" type="button" (click)="closeModal()" [disabled]="isSubmitting">
             Annuler
           </button>
           <button class="btn-primary" type="submit" [disabled]="isSubmitting">

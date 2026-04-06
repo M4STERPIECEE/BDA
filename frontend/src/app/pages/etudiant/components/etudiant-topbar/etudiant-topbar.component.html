@@ -1,32 +1,15 @@
-<nav class="fixed top-0 left-64 right-0 z-30 flex h-16 items-center justify-between bg-white px-8 py-0 backdrop-blur-[6px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(6px)_brightness(100%)]" aria-label="Barre de navigation superieure">
-  <div class="flex w-96 items-center gap-4 px-4 py-2 relative bg-[#f3f3fe] rounded-full" role="search">
-    <img class="relative flex-[0_0_auto]" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/container-7.svg" alt="" aria-hidden="true" />
-    <div class="flex flex-col items-start pt-[9px] pb-2.5 px-3 relative flex-1 grow">
-      <div class="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-        <p class="relative flex items-center self-stretch mt-[-1.00px] [font-family:'Inter',Helvetica] font-normal text-gray-500 text-sm tracking-[0] leading-[normal]">
-          Rechercher un etudiant ou une note...
-        </p>
-      </div>
+<nav class="fixed top-0 left-64 right-0 z-30 flex h-16 items-center justify-between bg-white px-8 py-0 border-b border-[#efedf9]" aria-label="Barre de navigation superieure">
+  <div class="topbar-left">
+    <span class="material-symbols-outlined">shield_person</span>
+    <div>
+      <p class="topbar-title">Espace Gestionnaire</p>
+      <p class="topbar-subtitle">Gestion des etudiants et des notes</p>
     </div>
   </div>
-  <div class="inline-flex items-center gap-6 relative flex-[0_0_auto]">
-    <img class="relative flex-[0_0_auto]" src="https://c.animaapp.com/mnbnobg3lUYjRB/img/container-4.svg" alt="Notifications" />
-    <div class="relative w-px h-8 bg-[#c3c6d74c]" aria-hidden="true"></div>
-    <div class="inline-flex items-center gap-3 relative flex-[0_0_auto]">
-      <div class="inline-flex flex-col items-start relative flex-[0_0_auto]">
-        <div class="flex flex-col items-end relative self-stretch w-full flex-[0_0_auto]">
-          <span class="relative justify-end w-[99.55px] h-[18px] mt-[-1.00px] [font-family:'Inter',Helvetica] font-bold text-[#191b23] text-sm text-right tracking-[0] leading-[17.5px] whitespace-nowrap flex items-center">
-            {{ username }}
-          </span>
-        </div>
-        <div class="flex flex-col items-end relative self-stretch w-full flex-[0_0_auto]">
-          <span class="relative justify-end w-[68.44px] h-4 mt-[-1.00px] [font-family:'Inter',Helvetica] font-normal text-[#434655] text-xs text-right tracking-[0] leading-4 whitespace-nowrap flex items-center">
-            {{ status }}
-          </span>
-        </div>
-      </div>
-      <div class="relative w-10 h-10 rounded-full bg-[url(https://c.animaapp.com/mnbnobg3lUYjRB/img/ab6axubp2hf3tpfor5r6fqruqvdzqxzoi4musphqz5l8gmghvjkx9s4gcgrpgcy5.png)] bg-cover bg-[50%_50%]" role="img" aria-label="Photo de profil Admin Curator"></div>
+  <div class="topbar-right">
+    <div class="identity">
+      <p class="identity-name">{{ username }}</p>
+      <p class="identity-role">{{ status }}</p>
     </div>
   </div>
 </nav>
-

@@ -13,6 +13,8 @@ import com.bda.bda.repository.StudentRepository;
 import com.bda.bda.repository.SubjectRepository;
 import com.bda.bda.security.DbUserContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -28,6 +30,16 @@ public class GradeService {
 
     public List<GradeResponse> findAll() {
         return gradeRepository.findAllWithDetails().stream().map(this::toResponse).toList();
+    }
+
+    public Page<GradeResponse> findAll(Pageable pageable) {
+        return gradeRepository.findAll(pageable).map(grade -> new GradeResponse(
+            grade.getStudent().getStudentId(),
+            grade.getStudent().getFullName(),
+            grade.getSubject().getSubjectId(),
+            grade.getSubject().getLabel(),
+            grade.getValue()
+        ));
     }
 
     public List<GradeResponse> findByStudent(Integer studentId) {

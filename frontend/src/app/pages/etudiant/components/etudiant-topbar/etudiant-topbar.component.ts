@@ -22,6 +22,9 @@ export class EtudiantTopbarComponent implements OnInit {
     if (!role) {
       return 'ETUDIANT';
     }
+    if (role.toUpperCase() === 'GESTIONNAIRE') {
+      return 'Gestionnaire';
+    }
     return role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'ETUDIANT';
   }
 }
