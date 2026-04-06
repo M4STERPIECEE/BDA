@@ -265,31 +265,31 @@
 
 .kpi-blue {
   background: #ffffff;
-  border: 1px solid rgba(91, 81, 248, 0.15);
-  box-shadow: 0 4px 20px rgba(91, 81, 248, 0.08);
+  border: 1px solid rgba(24, 23, 45, 0.08);
+  box-shadow: 0 4px 20px rgba(24, 23, 45, 0.07);
 }
 .kpi-blue .kpi-icon  { background: rgba(91, 81, 248, 0.12); color: #5b51f8; }
 .kpi-blue .kpi-value { color: #18172d; }
-.kpi-blue .kpi-glow  { background: radial-gradient(circle at top right, rgba(91, 81, 248, 0.12), transparent 60%); }
+.kpi-blue .kpi-glow  { background: none; }
 
 /* Violet variant */
 .kpi-violet {
   background: #ffffff;
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(24, 23, 45, 0.08);
+  box-shadow: 0 4px 20px rgba(24, 23, 45, 0.07);
 }
 .kpi-violet .kpi-icon  { background: rgba(139, 92, 246, 0.14); color: #7c3aed; }
 .kpi-violet .kpi-value { color: #18172d; }
-.kpi-violet .kpi-glow  { background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.12), transparent 60%); }
+.kpi-violet .kpi-glow  { background: none; }
 
 .kpi-red {
   background: #ffffff;
-  border: 1px solid rgba(220, 38, 38, 0.15);
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.07);
+  border: 1px solid rgba(24, 23, 45, 0.08);
+  box-shadow: 0 4px 20px rgba(24, 23, 45, 0.07);
 }
 .kpi-red .kpi-icon  { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
 .kpi-red .kpi-value { color: #18172d; }
-.kpi-red .kpi-glow  { background: radial-gradient(circle at top right, rgba(220, 38, 38, 0.1), transparent 60%); }
+.kpi-red .kpi-glow  { background: none; }
 
 .kpi-body { flex: 1; }
 

@@ -73,6 +73,6 @@ public class SubjectService {
     }
 
     private SubjectResponse toResponse(Subject s) {
-        return new SubjectResponse(s.getSubjectId(), s.getLabel(), s.getCoefficient());
+        return new SubjectResponse(SubjectResponse.formatSubjectId(s.getSubjectId()), s.getLabel(), s.getCoefficient());
     }
 }

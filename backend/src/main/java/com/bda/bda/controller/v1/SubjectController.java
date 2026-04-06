@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 
 @RestController
@@ -31,7 +30,9 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @GetMapping
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Subjects returned", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SubjectResponse.class))))})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subjects returned", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SubjectResponse.class))))
+    })
     public ResponseEntity<Page<SubjectResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,

@@ -41,12 +41,7 @@ public class AuthController {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .map(authority -> authority.replace("ROLE_", ""))
-                .map(this::toBusinessRole)
-                .orElse("ETUDIANT");
+        String role = userDetails.getAuthorities().stream().findFirst().map(GrantedAuthority::getAuthority).map(authority -> authority.replace("ROLE_", "")).map(this::toBusinessRole).orElse("ETUDIANT");
 
         String requestedRole = request.role().toUpperCase();
         if (!role.equals(requestedRole)) {
