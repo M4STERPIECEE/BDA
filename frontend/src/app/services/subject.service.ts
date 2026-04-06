@@ -9,6 +9,8 @@ interface CreateSubjectRequest {
   coefficient: number;
 }
 
+type UpsertSubjectRequest = CreateSubjectRequest;
+
 interface PageResponse<T> {
   content: T[];
   number: number;
@@ -64,6 +66,12 @@ export class SubjectService {
 
   createSubject(payload: CreateSubjectRequest): Observable<Subject> {
     return this.http.post<Subject>(this.apiUrl, payload, {
+      headers: this.buildAuthHeaders(),
+    });
+  }
+
+  updateSubject(subjectId: number, payload: UpsertSubjectRequest): Observable<Subject> {
+    return this.http.put<Subject>(`${this.apiUrl}/${subjectId}`, payload, {
       headers: this.buildAuthHeaders(),
     });
   }

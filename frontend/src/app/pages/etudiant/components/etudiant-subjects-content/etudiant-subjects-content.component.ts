@@ -44,6 +44,8 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
   searchTerm = '';
   filterHighCoefficientOnly = false;
   isCreateModalOpen = false;
+  editingSubjectId: number | null = null;
+  editingSubjectCode = '';
   isSubmitting = false;
   createErrorMessage = '';
   successToastMessage = '';
@@ -182,8 +184,41 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
 
   openCreateModal(): void {
     this.isCreateModalOpen = true;
+    this.editingSubjectId = null;
+    this.editingSubjectCode = '';
     this.createErrorMessage = '';
     this.subjectForm.reset({ label: '', coefficient: 1 });
+  }
+
+  openEditModal(subject: Subject): void {
+    const subjectId = this.extractSubjectNumericId(subject.subjectId);
+    if (subjectId === null) {
+      this.showSuccessToast('ID matière invalide. Impossible de modifier.');
+      return;
+    }
+
+    this.editingSubjectId = subjectId;
+    this.editingSubjectCode = String(subject.subjectId ?? '');
+    this.isCreateModalOpen = true;
+    this.createErrorMessage = '';
+    this.subjectForm.reset({
+      label: (subject.label ?? '').trim(),
+      coefficient: Number(subject.coefficient ?? 1),
+    });
+  }
+
+  onRowActionClick(action: RowAction, subject: Subject): void {
+    if (action.icon === 'edit') {
+      this.openEditModal(subject);
+      return;
+    }
+
+    if (action.icon === 'delete') {
+      this.showSuccessToast('Suppression non implémentée pour le moment.');
+      return;
+    }
+
+    this.showSuccessToast('Visualisation non implémentée pour le moment.');
   }
 
   closeCreateModal(): void {
@@ -192,6 +227,8 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     }
 
     this.isCreateModalOpen = false;
+    this.editingSubjectId = null;
+    this.editingSubjectCode = '';
     this.createErrorMessage = '';
     this.subjectForm.reset({ label: '', coefficient: 1 });
   }
@@ -217,12 +254,19 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.createErrorMessage = '';
 
-    this.subjectService.createSubject({ label, coefficient }).subscribe({
+    const isEditMode = this.editingSubjectId !== null;
+    const request$ = !isEditMode
+      ? this.subjectService.createSubject({ label, coefficient })
+      : this.subjectService.updateSubject(this.editingSubjectId as number, { label, coefficient });
+
+    request$.subscribe({
       next: () => {
         this.isSubmitting = false;
         this.isCreateModalOpen = false;
+        this.editingSubjectId = null;
+        this.editingSubjectCode = '';
         this.subjectForm.reset({ label: '', coefficient: 1 });
-        this.showSuccessToast('Matière ajoutée avec succès.');
+        this.showSuccessToast(isEditMode ? 'Matière modifiée avec succès.' : 'Matière ajoutée avec succès.');
         this.refreshSubjects(true);
       },
       error: (error: HttpErrorResponse) => {
@@ -232,7 +276,14 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.createErrorMessage = "Impossible d'ajouter la matière.";
+        if (error.status === 404 && isEditMode) {
+          this.createErrorMessage = 'Matière introuvable.';
+          return;
+        }
+
+        this.createErrorMessage = !isEditMode
+          ? "Impossible d'ajouter la matière."
+          : "Impossible de modifier la matière.";
       },
     });
   }
@@ -321,5 +372,25 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
       this.successToastMessage = '';
       this.toastTimeoutId = null;
     }, 1100);
+  }
+
+  private extractSubjectNumericId(subjectId: string): number | null {
+    const raw = String(subjectId ?? '').trim();
+    if (!raw) {
+      return null;
+    }
+
+    const direct = Number(raw);
+    if (Number.isInteger(direct) && direct > 0) {
+      return direct;
+    }
+
+    const match = raw.match(/(\d+)$/);
+    if (!match) {
+      return null;
+    }
+
+    const parsed = Number(match[1]);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }
 }
