@@ -1,8 +1,171 @@
-<section class="role-page">
-  <main class="role-card">
-    <h1>Espace Admin</h1>
-    <p>Connexion reussie. Cette page servira a la supervision et audit.</p>
-    <button type="button" (click)="logout()">Se deconnecter</button>
-  </main>
-</section>
+<main class="admin-page px-8 pb-14 pt-5">
+  <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+    <div>
+      <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
+        <span class="crumb-muted">Curator</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-active">Supervision</span>
+      </nav>
+      <h1 class="page-title">Audit des opérations sur les notes</h1>
+      <p class="page-subtitle">
+        Suivi des insertions, modifications et suppressions effectuées sur la table note.
+      </p>
+    </div>
+    <button class="btn-primary" type="button" (click)="refresh()">
+      <span class="material-symbols-outlined">refresh</span>
+      Actualiser
+    </button>
+  </div>
+
+  <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
+    <div class="kpi-card kpi-blue">
+      <p class="kpi-label">Insertions</p>
+      <h3 class="kpi-value">{{ auditStats.insertCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-violet">
+      <p class="kpi-label">Modifications</p>
+      <h3 class="kpi-value">{{ auditStats.updateCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-red">
+      <p class="kpi-label">Suppressions</p>
+      <h3 class="kpi-value">{{ auditStats.deleteCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <p class="kpi-label">Total audité</p>
+      <h3 class="kpi-value">{{ auditStats.totalCount }}</h3>
+    </div>
+  </div>
+
+  <section class="table-card mb-6">
+    <div class="table-toolbar">
+      <p class="toolbar-title">Filtres audit</p>
+      <div class="toolbar-actions flex flex-wrap items-center gap-3">
+        <button class="filter-pill" type="button" [class.filter-pill-active]="filterType === 'ALL'" (click)="setFilter('ALL')">Tous</button>
+        <button class="filter-pill" type="button" [class.filter-pill-active]="filterType === 'INSERT'" (click)="setFilter('INSERT')">INSERT</button>
+        <button class="filter-pill" type="button" [class.filter-pill-active]="filterType === 'UPDATE'" (click)="setFilter('UPDATE')">UPDATE</button>
+        <button class="filter-pill" type="button" [class.filter-pill-active]="filterType === 'DELETE'" (click)="setFilter('DELETE')">DELETE</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Date</th>
+            <th>N Etudiant</th>
+            <th>Nom</th>
+            <th>Matiere</th>
+            <th class="text-center">Ancienne note</th>
+            <th class="text-center">Nouvelle note</th>
+            <th>Utilisateur</th>
+            <th class="text-right">Détails</th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="loading">
+          <tr>
+            <td class="state-cell" colspan="9">
+              <div class="table-state">
+                <div class="loader-dots"><span></span><span></span><span></span></div>
+                <p>Chargement des données d’audit…</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="!loading && errorMessage">
+          <tr>
+            <td class="state-cell" colspan="9">
+              <div class="table-state table-error">
+                <span class="material-symbols-outlined">error_outline</span>
+                <p>{{ errorMessage }}</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="!loading && !errorMessage">
+          <tr *ngFor="let entry of filteredEntries" class="data-row">
+            <td>
+              <span
+                class="op-badge"
+                [ngClass]="{
+                  'op-insert': entry.operationType === 'INSERT',
+                  'op-update': entry.operationType === 'UPDATE',
+                  'op-delete': entry.operationType === 'DELETE'
+                }">
+                {{ entry.operationType }}
+              </span>
+            </td>
+            <td>{{ entry.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+            <td>{{ entry.studentId }}</td>
+            <td>{{ entry.studentName }}</td>
+            <td>{{ entry.subjectLabel }}</td>
+            <td class="text-center">{{ formatValue(entry.oldValue) }}</td>
+            <td class="text-center">{{ formatValue(entry.newValue) }}</td>
+            <td>{{ entry.dbUser }}</td>
+            <td class="text-right">
+              <button class="action-btn action-view" type="button" (click)="openAuditDetails(entry)">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredEntries.length === 0">
+            <td class="state-cell" colspan="9">
+              <div class="table-state">
+                <span class="material-symbols-outlined">info</span>
+                <p>Aucune operation pour ce filtre.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <p class="footer-count">{{ filteredEntries.length }} operation(s) affichée(s)</p>
+      <button class="btn-secondary" type="button" (click)="logout()">Se deconnecter</button>
+    </div>
+  </section>
+
+  <section class="table-card">
+    <div class="table-toolbar">
+      <p class="toolbar-title">Dernières opérations</p>
+    </div>
+    <div class="recent-list">
+      <article *ngFor="let entry of recentEntries" class="recent-item">
+        <div>
+          <p class="recent-title">{{ entry.operationType }} - {{ entry.studentName }}</p>
+          <p class="recent-subtitle">{{ entry.subjectLabel }} • {{ entry.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+        </div>
+        <span class="recent-value">{{ formatValue(entry.newValue) }}</span>
+      </article>
+      <div *ngIf="!loading && !errorMessage && recentEntries.length === 0" class="empty-state">
+        Aucune donnée d’audit disponible.
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="selectedAudit" class="modal-backdrop" (click)="closeAuditDetails()">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Détails de l'audit" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Détails de l’opération</h3>
+        <button class="modal-close" type="button" (click)="closeAuditDetails()" aria-label="Fermer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="details-grid">
+        <div><span>Opération</span><strong>{{ selectedAudit.operationType }}</strong></div>
+        <div><span>Date</span><strong>{{ selectedAudit.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</strong></div>
+        <div><span>Étudiant</span><strong>{{ selectedAudit.studentId }} - {{ selectedAudit.studentName }}</strong></div>
+        <div><span>Matière</span><strong>{{ selectedAudit.subjectLabel }}</strong></div>
+        <div><span>Ancienne note</span><strong>{{ formatValue(selectedAudit.oldValue) }}</strong></div>
+        <div><span>Nouvelle note</span><strong>{{ formatValue(selectedAudit.newValue) }}</strong></div>
+        <div><span>Utilisateur</span><strong>{{ selectedAudit.dbUser }}</strong></div>
+      </div>
+    </div>
+  </div>
+</main>
 
