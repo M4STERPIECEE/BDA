@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:host {
+  display: block;
+  height: 100%;
+  font-family: 'Outfit', sans-serif;
+}
+
+.dashboard-page {
+  min-height: calc(100vh - 4rem);
+  background: #f4f3fb;
+}
+
+.breadcrumb { color: #9694b4; letter-spacing: 0.1em; }
+.crumb-muted { opacity: 0.55; }
+.crumb-sep { opacity: 0.35; margin: 0 2px; }
+.crumb-active { color: #5b51f8; font-weight: 700; }
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #18172d;
+  margin-bottom: 0.35rem;
+}
+
+.page-subtitle {
+  font-size: 0.92rem;
+  color: #6b6987;
+}
+
+.table-card {
+  background: #ffffff;
+  border-radius: 22px;
+  border: 1px solid rgba(91, 81, 248, 0.08);
+  box-shadow: 0 4px 32px rgba(24, 23, 45, 0.07);
+}
+
+.placeholder-wrap {
+  min-height: 320px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #6b6987;
+}
+
+.placeholder-wrap .material-symbols-outlined {
+  font-size: 2rem;
+  color: #5b51f8;
+}
+
+.placeholder-wrap h3 {
+  margin: 0.6rem 0 0.3rem;
+  font-size: 1.15rem;
+  color: #1f2036;
+}
+
+.placeholder-wrap p {
+  margin: 0;
+  max-width: 520px;
+}

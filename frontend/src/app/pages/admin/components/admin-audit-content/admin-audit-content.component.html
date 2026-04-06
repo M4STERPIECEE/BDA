@@ -1,0 +1,179 @@
+<main class="audit-page px-8 pb-14 pt-5">
+  <div class="page-header mb-5 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+    <div>
+      <nav class="breadcrumb mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
+        <span class="crumb-muted">Curator</span>
+        <span class="crumb-sep">›</span>
+        <span class="crumb-active">Audit des Notes</span>
+      </nav>
+      <h2 class="page-title">Audit des Notes</h2>
+      <p class="page-subtitle">
+        Supervision des opérations INSERT / UPDATE / DELETE effectuées sur la table des notes.
+      </p>
+    </div>
+    <button
+      class="refresh-btn-lg"
+      type="button"
+      (click)="refresh()"
+      [disabled]="loading"
+      title="Actualiser">
+      <span class="material-symbols-outlined">refresh</span>
+      Actualiser
+    </button>
+  </div>
+
+  <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
+    <div class="kpi-card">
+      <p class="kpi-label">Total Opérations</p>
+      <h3 class="kpi-value">{{ stats.totalCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-insert">
+      <p class="kpi-label">Insertions</p>
+      <h3 class="kpi-value kpi-value-insert">{{ stats.insertCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-update">
+      <p class="kpi-label">Modifications</p>
+      <h3 class="kpi-value kpi-value-update">{{ stats.updateCount }}</h3>
+    </div>
+    <div class="kpi-card kpi-delete">
+      <p class="kpi-label">Suppressions</p>
+      <h3 class="kpi-value kpi-value-delete">{{ stats.deleteCount }}</h3>
+    </div>
+  </div>
+
+  <section class="table-card">
+    <div class="table-toolbar">
+      <p class="toolbar-title">Historique des opérations</p>
+      <div class="toolbar-actions flex items-center gap-2">
+        <button
+          class="filter-pill"
+          [class.filter-pill-active]="activeFilter === ''"
+          (click)="setFilter('')">
+          Tous
+        </button>
+        <button
+          class="filter-pill filter-pill-insert"
+          [class.filter-pill-active]="activeFilter === 'INSERT'"
+          (click)="setFilter('INSERT')">
+          INSERT
+        </button>
+        <button
+          class="filter-pill filter-pill-update"
+          [class.filter-pill-active]="activeFilter === 'UPDATE'"
+          (click)="setFilter('UPDATE')">
+          UPDATE
+        </button>
+        <button
+          class="filter-pill filter-pill-delete"
+          [class.filter-pill-active]="activeFilter === 'DELETE'"
+          (click)="setFilter('DELETE')">
+          DELETE
+        </button>
+        <div class="search-wrap ml-2">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            class="search-input"
+            placeholder="Rechercher étudiant / matière..."
+            type="text"
+            [value]="searchTerm"
+            (input)="onSearchChange(($any($event.target).value ?? '').toString())" />
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Opération</th>
+            <th>Date</th>
+            <th>N° Étudiant</th>
+            <th>Nom</th>
+            <th>Matière</th>
+            <th class="text-center">Anc. Note</th>
+            <th class="text-center">Nouv. Note</th>
+            <th>Utilisateur</th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="!loading && !errorMessage">
+          <tr
+            *ngFor="let entry of displayedEntries; trackBy: trackById; let i = index"
+            class="data-row"
+            [style.animation-delay]="i * 20 + 'ms'">
+            <td>
+              <span
+                class="op-badge"
+                [ngClass]="{
+                  'op-insert': entry.operationType === 'INSERT',
+                  'op-update': entry.operationType === 'UPDATE',
+                  'op-delete': entry.operationType === 'DELETE'
+                }">
+                {{ entry.operationType }}
+              </span>
+            </td>
+            <td class="date-cell">{{ entry.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+            <td><span class="student-id">{{ entry.studentId }}</span></td>
+            <td>{{ entry.studentName }}</td>
+            <td>{{ entry.subjectLabel }}</td>
+            <td class="text-center">
+              <span class="note-cell note-old">{{ formatNote(entry.oldValue) }}</span>
+            </td>
+            <td class="text-center">
+              <span class="note-cell note-new">{{ formatNote(entry.newValue) }}</span>
+            </td>
+            <td>
+              <span class="user-chip">{{ entry.dbUser }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="displayedEntries.length === 0">
+            <td class="state-cell" colspan="8">Aucune entrée d'audit trouvée.</td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="loading">
+          <tr>
+            <td class="state-cell" colspan="8">
+              <div class="loading-wrap">
+                <span class="loading-spinner"></span>
+                Chargement de l'audit...
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="!loading && errorMessage">
+          <tr>
+            <td class="state-cell error-cell" colspan="8">
+              <span class="material-symbols-outlined">error</span>
+              {{ errorMessage }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <div class="footer-stats">
+        <span class="footer-stat">
+          <span class="stat-dot stat-dot-insert"></span>
+          Insertions : <strong>{{ stats.insertCount }}</strong>
+        </span>
+        <span class="footer-sep">|</span>
+        <span class="footer-stat">
+          <span class="stat-dot stat-dot-update"></span>
+          Modifications : <strong>{{ stats.updateCount }}</strong>
+        </span>
+        <span class="footer-sep">|</span>
+        <span class="footer-stat">
+          <span class="stat-dot stat-dot-delete"></span>
+          Suppressions : <strong>{{ stats.deleteCount }}</strong>
+        </span>
+        <span class="footer-sep">|</span>
+        <span class="footer-stat">
+          Total : <strong>{{ displayedEntries.length }}</strong> affiché(s)
+        </span>
+      </div>
+    </div>
+  </section>
+</main>
