@@ -18,6 +18,13 @@
   padding: 1.6rem 1rem;
 }
 
+.brand-block h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #191b23 !important;
+}
+
 .brand-block h2 {
   margin: 0;
   font-size: 1.55rem;
