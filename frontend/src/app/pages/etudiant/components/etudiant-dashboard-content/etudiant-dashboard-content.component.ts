@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, forkJoin, of, Subject, takeUntil, timeout } from 'rxjs';
 import { Grade } from '../../../../models/grade.model';
@@ -123,6 +123,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
     private readonly subjectService: SubjectService,
     private readonly gradeService: GradeService,
     private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -234,6 +235,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
           ...this.statCards[2],
           value: this.formatInteger(firstPage.totalElements),
         };
+        this.cdr.detectChanges();
 
         if (firstPage.totalPages <= 1) {
           this.applyBucketCounts(bucketCounts);
@@ -283,6 +285,8 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       footerText: globalAverage >= 10 ? 'Niveau global satisfaisant' : 'Niveau global à améliorer',
       footerTrend: globalAverage >= 10 ? 'trend-up' : 'trend-down',
     };
+
+    this.cdr.detectChanges();
   }
 
   private applySubjectMetrics(totalSubjects: number, subjects: SubjectModel[], latestSubjectLabel: string): void {
@@ -307,6 +311,8 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       footerText: latestSubjectLabel ? `Dernière: ${latestSubjectLabel}` : 'Aucune matière',
       footerTrend: 'trend-neutral',
     };
+
+    this.cdr.detectChanges();
   }
 
   private accumulateBucketCounts(grades: Grade[], bucketCounts: number[]): void {
@@ -335,6 +341,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
     }));
 
     this.gridLines = this.buildGridLines();
+    this.cdr.detectChanges();
   }
 
   private normalizeSubjectsResponse(response: SubjectsApiResponse | PagedResponse<SubjectModel>, page: number): PagedResponse<SubjectModel> {
