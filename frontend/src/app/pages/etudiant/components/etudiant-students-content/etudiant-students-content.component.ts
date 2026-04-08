@@ -53,9 +53,15 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   loading = true;
   errorMessage = '';
   isCreateModalOpen = false;
+  isDeleteConfirmOpen = false;
   isSubmitting = false;
+  isDeletingStudent = false;
   createErrorMessage = '';
+  deleteErrorMessage = '';
   successToastMessage = '';
+  editingStudentId: number | null = null;
+  editingStudentCode = '';
+  studentPendingDelete: Student | null = null;
   readonly studentForm;
 
   readonly tableHeaders: TableHeader[] = [
@@ -114,8 +120,81 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
 
   openCreateModal(): void {
     this.isCreateModalOpen = true;
+    this.editingStudentId = null;
+    this.editingStudentCode = '';
     this.createErrorMessage = '';
     this.studentForm.reset({ fullName: '' });
+  }
+
+  openEditModal(student: Student): void {
+    this.isCreateModalOpen = true;
+    this.editingStudentId = Number(student.studentId);
+    this.editingStudentCode = student.studentCode || ('#' + student.studentId);
+    this.createErrorMessage = '';
+    this.studentForm.reset({ fullName: (student.fullName ?? '').trim() });
+  }
+
+  openDeleteConfirmModal(student: Student): void {
+    this.studentPendingDelete = student;
+    this.deleteErrorMessage = '';
+    this.isDeleteConfirmOpen = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    if (this.isDeletingStudent) {
+      return;
+    }
+
+    this.isDeleteConfirmOpen = false;
+    this.studentPendingDelete = null;
+    this.deleteErrorMessage = '';
+  }
+
+  confirmDeleteStudent(): void {
+    if (this.isDeletingStudent || !this.studentPendingDelete) {
+      return;
+    }
+
+    const target = this.studentPendingDelete;
+    this.isDeletingStudent = true;
+    this.deleteErrorMessage = '';
+
+    this.studentService.deleteStudent(target.studentId).subscribe({
+      next: () => {
+        const shouldGoPreviousPage = this.students.length === 1 && this.currentPage > 0;
+        this.isDeletingStudent = false;
+        this.isDeleteConfirmOpen = false;
+        this.studentPendingDelete = null;
+        this.showSuccessToast('Etudiant supprime avec succes.');
+        this.loadStudents(shouldGoPreviousPage ? this.currentPage - 1 : this.currentPage, false);
+        this.loadStats();
+        this.cdr.detectChanges();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isDeletingStudent = false;
+        if (error.status === 404) {
+          this.deleteErrorMessage = 'Etudiant introuvable.';
+          this.cdr.detectChanges();
+          return;
+        }
+        this.deleteErrorMessage = "Impossible de supprimer l'etudiant.";
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onRowActionClick(action: RowAction, student: Student): void {
+    if (action.icon === 'edit') {
+      this.openEditModal(student);
+      return;
+    }
+
+    if (action.icon === 'delete') {
+      this.openDeleteConfirmModal(student);
+      return;
+    }
+
+    this.showSuccessToast('Visualisation non implémentée pour le moment.');
   }
 
   closeCreateModal(): void {
@@ -124,6 +203,8 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     }
 
     this.isCreateModalOpen = false;
+    this.editingStudentId = null;
+    this.editingStudentCode = '';
     this.createErrorMessage = '';
     this.studentForm.reset({ fullName: '' });
   }
@@ -143,18 +224,33 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.createErrorMessage = '';
 
-    this.studentService.createStudent({ fullName }).subscribe({
-      next: (createdStudent: Student) => {
+    const isEditMode = this.editingStudentId !== null;
+    const request$ = isEditMode
+      ? this.studentService.updateStudent(this.editingStudentId as number, { fullName })
+      : this.studentService.createStudent({ fullName });
+
+    request$.subscribe({
+      next: (resultStudent: Student) => {
         this.isSubmitting = false;
         this.isCreateModalOpen = false;
+        this.editingStudentId = null;
+        this.editingStudentCode = '';
         this.studentForm.reset({ fullName: '' });
 
-        this.showSuccessToast('Etudiant ajoute avec succes.');
-        this.students = [createdStudent, ...this.students].slice(0, this.pageSize);
-        this.statsTotalStudents = Math.max(this.statsTotalStudents + 1, this.students.length);
+        this.showSuccessToast(isEditMode ? 'Etudiant modifie avec succes.' : 'Etudiant ajoute avec succes.');
+
+        if (isEditMode) {
+          this.students = this.students.map((s) =>
+            s.studentId === resultStudent.studentId ? resultStudent : s,
+          );
+        } else {
+          this.students = [resultStudent, ...this.students].slice(0, this.pageSize);
+          this.statsTotalStudents = Math.max(this.statsTotalStudents + 1, this.students.length);
+          this.currentPage = 0;
+        }
+
         this.totalPages = Math.max(this.totalPages, Math.ceil(this.statsTotalStudents / this.pageSize));
         this.writeStudentsCache(this.students);
-        this.currentPage = 0;
         this.loadStudents(this.currentPage, false);
         this.loadStats();
         this.cdr.detectChanges();
@@ -167,7 +263,15 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.createErrorMessage = "Impossible d'ajouter l'etudiant.";
+        if (error.status === 404 && isEditMode) {
+          this.createErrorMessage = 'Etudiant introuvable.';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.createErrorMessage = isEditMode
+          ? "Impossible de modifier l'etudiant."
+          : "Impossible d'ajouter l'etudiant.";
         this.cdr.detectChanges();
       },
     });

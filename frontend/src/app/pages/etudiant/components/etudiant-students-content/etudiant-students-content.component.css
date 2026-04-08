@@ -98,8 +98,30 @@
   background: #e7e3ff;
 }
 
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: #dc2626;
+  border: 1px solid #dc2626;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
 .btn-primary:disabled,
-.btn-secondary:disabled {
+.btn-secondary:disabled,
+.btn-danger:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
@@ -210,6 +232,34 @@
   color: #ff5252;
   font-size: 0.78rem;
   font-weight: 500;
+}
+
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.confirm-text {
+  margin: 0;
+  color: #434655;
+  font-size: 0.9rem;
+}
+
+.confirm-target {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #18172d;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.confirm-target .student-id {
+  color: #5b51f8;
+  background: #f0eeff;
 }
 
 .modal-actions {

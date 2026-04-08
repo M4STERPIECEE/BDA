@@ -8,6 +8,8 @@ interface CreateStudentRequest {
   fullName: string;
 }
 
+type UpsertStudentRequest = CreateStudentRequest;
+
 interface PageResponse<T> {
   content: T[];
   number: number;
@@ -44,6 +46,18 @@ export class StudentService {
 
   createStudent(payload: CreateStudentRequest): Observable<Student> {
     return this.http.post<Student>(this.apiUrl, payload, {
+      headers: this.buildAuthHeaders(),
+    });
+  }
+
+  updateStudent(studentId: number, payload: UpsertStudentRequest): Observable<Student> {
+    return this.http.put<Student>(`${this.apiUrl}/${studentId}`, payload, {
+      headers: this.buildAuthHeaders(),
+    });
+  }
+
+  deleteStudent(studentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${studentId}`, {
       headers: this.buildAuthHeaders(),
     });
   }

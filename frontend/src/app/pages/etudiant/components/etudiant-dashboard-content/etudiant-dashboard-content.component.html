@@ -61,7 +61,7 @@
       <div class="quick-actions-card">
         <h2 class="section-title mb-5">Actions rapides</h2>
         <div class="actions-list">
-          <button *ngFor="let action of quickActions" type="button" class="action-item" [attr.aria-label]="action.ariaLabel">
+          <button *ngFor="let action of quickActions" type="button" class="action-item" [attr.aria-label]="action.ariaLabel" (click)="goToAction(action)">
             <div class="action-left">
               <div class="action-icon-wrap">
                 <img [src]="action.icon" alt="" aria-hidden="true" class="action-icon-img" />
