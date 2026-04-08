@@ -1,5 +1,4 @@
 .idea
 .env
 /secrets/
-.node_modules
-
+node_modules/
