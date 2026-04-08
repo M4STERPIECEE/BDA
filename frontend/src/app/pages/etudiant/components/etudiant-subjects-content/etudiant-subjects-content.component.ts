@@ -44,10 +44,14 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
   searchTerm = '';
   filterHighCoefficientOnly = false;
   isCreateModalOpen = false;
+  isDeleteConfirmOpen = false;
   editingSubjectId: number | null = null;
   editingSubjectCode = '';
+  subjectPendingDelete: Subject | null = null;
   isSubmitting = false;
+  isDeletingSubject = false;
   createErrorMessage = '';
+  deleteErrorMessage = '';
   successToastMessage = '';
   readonly subjectForm;
   statsTotalSubjects = 0;
@@ -214,7 +218,7 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     }
 
     if (action.icon === 'delete') {
-      this.showSuccessToast('Suppression non implémentée pour le moment.');
+      this.openDeleteConfirmModal(subject);
       return;
     }
 
@@ -231,6 +235,66 @@ export class EtudiantSubjectsContentComponent implements OnInit, OnDestroy {
     this.editingSubjectCode = '';
     this.createErrorMessage = '';
     this.subjectForm.reset({ label: '', coefficient: 1 });
+  }
+
+  openDeleteConfirmModal(subject: Subject): void {
+    this.subjectPendingDelete = subject;
+    this.deleteErrorMessage = '';
+    this.isDeleteConfirmOpen = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    if (this.isDeletingSubject) {
+      return;
+    }
+
+    this.isDeleteConfirmOpen = false;
+    this.subjectPendingDelete = null;
+    this.deleteErrorMessage = '';
+  }
+
+  confirmDeleteSubject(): void {
+    if (this.isDeletingSubject || !this.subjectPendingDelete) {
+      return;
+    }
+
+    const subjectId = this.extractSubjectNumericId(this.subjectPendingDelete.subjectId);
+    if (subjectId === null) {
+      this.deleteErrorMessage = 'ID matière invalide. Suppression impossible.';
+      return;
+    }
+
+    this.isDeletingSubject = true;
+    this.deleteErrorMessage = '';
+
+    this.subjectService.deleteSubject(subjectId).subscribe({
+      next: () => {
+        const shouldGoPreviousPage = this.subjects.length === 1 && this.currentPage > 0;
+
+        this.isDeletingSubject = false;
+        this.isDeleteConfirmOpen = false;
+        this.subjectPendingDelete = null;
+        this.showSuccessToast('Matière supprimée avec succès.');
+
+        this.loadSubjects(shouldGoPreviousPage ? this.currentPage - 1 : this.currentPage, true);
+        this.loadStats();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isDeletingSubject = false;
+
+        if (error.status === 404) {
+          this.deleteErrorMessage = 'Matière introuvable.';
+          return;
+        }
+
+        if (error.status === 409) {
+          this.deleteErrorMessage = 'Suppression impossible: matière liée à des notes.';
+          return;
+        }
+
+        this.deleteErrorMessage = 'Impossible de supprimer la matière.';
+      },
+    });
   }
 
   submitCreateSubject(): void {

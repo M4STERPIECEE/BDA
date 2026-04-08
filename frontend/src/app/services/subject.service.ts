@@ -76,6 +76,14 @@ export class SubjectService {
     });
   }
 
+  deleteSubject(subjectId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${subjectId}`, {
+      headers: this.buildAuthHeaders(),
+    }).pipe(
+      timeout(15000)
+    );
+  }
+
   private buildAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('bda_token');
     if (!token) {

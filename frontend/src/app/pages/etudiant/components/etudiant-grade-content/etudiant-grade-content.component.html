@@ -122,7 +122,7 @@
         {{ displayedGrades.length }} note(s) affichée(s)
         <span *ngIf="searchTerm"> — filtrée(s) sur « {{ searchTerm }} »</span>
       </p>
-      <div class="pagination" *ngIf="totalPages > 1 && !searchTerm">
+      <div class="pagination" *ngIf="totalPages > 0">
         <button
           type="button"
           class="page-btn"
