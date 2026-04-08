@@ -57,7 +57,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       footerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-3.svg',
       footerText: 'Chargement...',
       footerTrend: 'trend-neutral',
-      cornerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-12.svg',
+      cornerIcon: 'groups',
     },
     {
       label: 'Nombre de matières',
@@ -65,7 +65,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       accentClass: 'stat-accent-violet',
       footerText: 'Chargement...',
       footerTrend: 'trend-neutral',
-      cornerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-11.svg',
+      cornerIcon: 'menu_book',
     },
     {
       label: 'Nombre de notes',
@@ -74,7 +74,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       footerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-5.svg',
       footerText: 'Données synchronisées',
       footerTrend: 'trend-neutral',
-      cornerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-2.svg',
+      cornerIcon: 'assignment',
     },
     {
       label: 'Moyenne globale',
@@ -83,7 +83,7 @@ export class EtudiantDashboardContentComponent implements OnInit, OnDestroy {
       footerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container-8.svg',
       footerText: 'Calculée en temps réel',
       footerTrend: 'trend-neutral',
-      cornerIcon: 'https://c.animaapp.com/mnbnobg3lUYjRB/img/container.svg',
+      cornerIcon: 'monitoring',
       suffix: '/20',
     },
   ];

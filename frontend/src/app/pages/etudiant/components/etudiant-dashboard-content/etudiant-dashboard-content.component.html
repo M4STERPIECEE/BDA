@@ -11,15 +11,17 @@
   <div class="stat-grid mb-10">
     <article *ngFor="let card of statCards" class="stat-card" [ngClass]="card.accentClass">
       <div class="stat-card-inner">
-        <div class="stat-card-top">
-          <div class="stat-icon-wrap">
-            <img [src]="card.cornerIcon" alt="" aria-hidden="true" class="stat-icon-img" />
+        <div class="stat-head-row">
+          <div class="stat-main">
+            <p class="stat-label">{{ card.label }}</p>
+            <div class="stat-value-row">
+              <strong class="stat-value">{{ card.value }}</strong>
+              <span *ngIf="card.suffix" class="stat-suffix">{{ card.suffix }}</span>
+            </div>
           </div>
-        </div>
-        <p class="stat-label">{{ card.label }}</p>
-        <div class="stat-value-row">
-          <strong class="stat-value">{{ card.value }}</strong>
-          <span *ngIf="card.suffix" class="stat-suffix">{{ card.suffix }}</span>
+          <div class="stat-icon-wrap">
+            <span class="material-symbols-outlined stat-icon-symbol" aria-hidden="true">{{ card.cornerIcon }}</span>
+          </div>
         </div>
         <div *ngIf="card.footerText" class="stat-footer">
           <img *ngIf="card.footerIcon" [src]="card.footerIcon" alt="" aria-hidden="true" class="stat-footer-icon" />
