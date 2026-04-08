@@ -12,20 +12,48 @@
   </div>
   <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4">
     <div class="kpi-card">
-      <p class="kpi-label">Total Notes</p>
-      <h3 class="kpi-value">{{ grades.length }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Total Notes</p>
+          <h3 class="kpi-value">{{ grades.length }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-blue">
+          <span class="material-symbols-outlined">assignment</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Moyenne Globale</p>
-      <h3 class="kpi-value">{{ globalAverage | number:'1.2-2' }}/20</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Moyenne Globale</p>
+          <h3 class="kpi-value">{{ globalAverage | number:'1.2-2' }}/20</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-violet">
+          <span class="material-symbols-outlined">monitoring</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Étudiants</p>
-      <h3 class="kpi-value">{{ totalStudents }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Étudiants</p>
+          <h3 class="kpi-value">{{ totalStudents }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-teal">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Matières</p>
-      <h3 class="kpi-value">{{ totalSubjects }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Matières</p>
+          <h3 class="kpi-value">{{ totalSubjects }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-amber">
+          <span class="material-symbols-outlined">menu_book</span>
+        </div>
+      </div>
     </div>
   </div>
   <section class="table-card">
