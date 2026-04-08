@@ -60,6 +60,18 @@
   padding: 1rem 1.2rem;
 }
 
+.kpi-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.kpi-body {
+  flex: 1;
+  min-width: 0;
+}
+
 .contenu-style {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -86,6 +98,41 @@
   letter-spacing: -0.02em;
   color: #18172d;
   font-weight: 800;
+}
+
+.kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-icon .material-symbols-outlined {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.kpi-icon-blue {
+  background: rgba(91, 81, 248, 0.12);
+  color: #5b51f8;
+}
+
+.kpi-icon-insert {
+  background: rgba(15, 158, 116, 0.12);
+  color: #0f9e74;
+}
+
+.kpi-icon-update {
+  background: rgba(67, 56, 202, 0.12);
+  color: #4338ca;
+}
+
+.kpi-icon-delete {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
 }
 
 .table-card {

@@ -15,27 +15,55 @@
 
   <div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-4 contenu-style">
     <div class="kpi-card">
-      <p class="kpi-label">Total Opérations</p>
-      <h3 class="kpi-value">{{ stats.totalCount }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Total Opérations</p>
+          <h3 class="kpi-value">{{ stats.totalCount }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-blue">
+          <span class="material-symbols-outlined">monitoring</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Insertions</p>
-      <h3 class="kpi-value">{{ stats.insertCount }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Insertions</p>
+          <h3 class="kpi-value">{{ stats.insertCount }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-insert">
+          <span class="material-symbols-outlined">add_circle</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Modifications</p>
-      <h3 class="kpi-value">{{ stats.updateCount }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Modifications</p>
+          <h3 class="kpi-value">{{ stats.updateCount }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-update">
+          <span class="material-symbols-outlined">edit_square</span>
+        </div>
+      </div>
     </div>
     <div class="kpi-card">
-      <p class="kpi-label">Suppressions</p>
-      <h3 class="kpi-value">{{ stats.deleteCount }}</h3>
+      <div class="kpi-head">
+        <div class="kpi-body">
+          <p class="kpi-label">Suppressions</p>
+          <h3 class="kpi-value">{{ stats.deleteCount }}</h3>
+        </div>
+        <div class="kpi-icon kpi-icon-delete">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <section class="table-card">
     <div class="table-toolbar">
       <p class="toolbar-title">Historique des opérations</p>
-      <div class="toolbar-actions flex items-center gap-2">
+      <div class="toolbar-actions flex items-center gap-2 filter-button">
         <button
           class="filter-pill"
           [class.filter-pill-active]="activeFilter === ''"
@@ -103,18 +131,14 @@
             <td>
               <span
                 class="op-badge"
-                [ngClass]="{
-                  'op-insert': entry.operationType === 'INSERT',
-                  'op-update': entry.operationType === 'UPDATE',
-                  'op-delete': entry.operationType === 'DELETE'
-                }">
-                {{ entry.operationType }}
+                [ngClass]="getOperationClass(entry.operationType)">
+                {{ formatOperationLabel(entry.operationType) }}
               </span>
             </td>
             <td class="date-cell">{{ entry.updatedAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-            <td><span class="student-id">{{ entry.studentId }}</span></td>
-            <td>{{ entry.studentName }}</td>
-            <td>{{ entry.subjectLabel }}</td>
+            <td><span class="student-id">{{ formatStudentDisplayId(entry.studentId) }}</span></td>
+            <td>{{ entry.studentName || '-' }}</td>
+            <td>{{ entry.subjectLabel || '-' }}</td>
             <td class="text-center">
               <span class="note-cell note-old">{{ formatNote(entry.oldValue) }}</span>
             </td>
@@ -122,7 +146,7 @@
               <span class="note-cell note-new">{{ formatNote(entry.newValue) }}</span>
             </td>
             <td>
-              <span class="user-chip">{{ entry.dbUser }}</span>
+              <span class="user-chip">{{ entry.dbUser || '-' }}</span>
             </td>
           </tr>
           <tr *ngIf="displayedEntries.length === 0">

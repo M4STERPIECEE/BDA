@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../utils/api-config';
 import { AuditEntry, AuditStats } from '../models/audit.model';
@@ -12,9 +12,11 @@ export class AuditService {
   constructor(private readonly http: HttpClient) {}
 
   getAuditEntries(operationType?: string): Observable<AuditEntry[]> {
-    const params = operationType
-      ? ({ type: operationType } as Record<string, string>)
-      : undefined;
+    const uniqueTs = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    let params = new HttpParams().set('_ts', uniqueTs);
+    if (operationType) {
+      params = params.set('type', operationType);
+    }
 
     return this.http.get<AuditEntry[]>(this.apiUrl, {
       params,
