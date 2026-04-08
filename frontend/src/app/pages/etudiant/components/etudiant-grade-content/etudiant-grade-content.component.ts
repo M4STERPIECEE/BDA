@@ -40,7 +40,11 @@ export class EtudiantGradeContentComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   modalErrorMessage = '';
   successToastMessage = '';
+  isDeleteConfirmOpen = false;
+  isDeletingGrade = false;
+  deleteErrorMessage = '';
   editingGrade: Grade | null = null;
+  gradePendingDelete: Grade | null = null;
 
   isStudentDropdownOpen = false;
   isSubjectDropdownOpen = false;
@@ -250,21 +254,56 @@ export class EtudiantGradeContentComponent implements OnInit, OnDestroy {
   }
 
   deleteGrade(grade: Grade): void {
-    const confirmed = window.confirm(
-      `Supprimer la note de ${grade.studentName} en ${grade.subjectLabel} ?`
-    );
-    if (!confirmed) return;
+    this.gradePendingDelete = grade;
+    this.deleteErrorMessage = '';
+    this.isDeleteConfirmOpen = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    if (this.isDeletingGrade) return;
+
+    this.isDeleteConfirmOpen = false;
+    this.gradePendingDelete = null;
+    this.deleteErrorMessage = '';
+  }
+
+  confirmDeleteGrade(): void {
+    if (this.isDeletingGrade || !this.gradePendingDelete) return;
+
+    const target = this.gradePendingDelete;
+    this.isDeletingGrade = true;
+    this.deleteErrorMessage = '';
 
     this.gradeService
-      .deleteGrade(grade.studentId, grade.subjectId)
+      .deleteGrade(target.studentId, target.subjectId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.loadGrades(this.currentPage, false);
+          const shouldGoPreviousPage = this.grades.length === 1 && this.currentPage > 0;
+
+          this.isDeletingGrade = false;
+          this.isDeleteConfirmOpen = false;
+          this.gradePendingDelete = null;
+          this.successToastMessage = 'Note supprimée avec succès.';
+          if (this.toastTimeoutId) {
+            clearTimeout(this.toastTimeoutId);
+          }
+          this.toastTimeoutId = setTimeout(() => {
+            this.successToastMessage = '';
+          }, 2600);
+
+          this.loadGrades(shouldGoPreviousPage ? this.currentPage - 1 : this.currentPage, false);
           this.loadRefData();
         },
-        error: () => {
-          this.gradesErrorMessage = 'Impossible de supprimer la note.';
+        error: (error: HttpErrorResponse) => {
+          this.isDeletingGrade = false;
+
+          if (error.status === 404) {
+            this.deleteErrorMessage = 'Note introuvable.';
+            return;
+          }
+
+          this.deleteErrorMessage = 'Impossible de supprimer la note.';
         },
       });
   }
