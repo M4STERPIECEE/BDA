@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 
@@ -86,6 +86,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   constructor(
     private readonly studentService: StudentService,
     private readonly formBuilder: FormBuilder,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.studentForm = this.formBuilder.nonNullable.group({
       fullName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -150,19 +151,24 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
 
         this.showSuccessToast('Etudiant ajoute avec succes.');
         this.students = [createdStudent, ...this.students].slice(0, this.pageSize);
+        this.statsTotalStudents = Math.max(this.statsTotalStudents + 1, this.students.length);
+        this.totalPages = Math.max(this.totalPages, Math.ceil(this.statsTotalStudents / this.pageSize));
         this.writeStudentsCache(this.students);
         this.currentPage = 0;
         this.loadStudents(this.currentPage, false);
         this.loadStats();
+        this.cdr.detectChanges();
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
         if (error.status === 409) {
           this.createErrorMessage = 'Cet etudiant existe deja.';
+          this.cdr.detectChanges();
           return;
         }
 
         this.createErrorMessage = "Impossible d'ajouter l'etudiant.";
+        this.cdr.detectChanges();
       },
     });
   }
@@ -239,6 +245,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
         this.totalPages = Math.max(Number(response.totalPages ?? 0), hasStudents ? 1 : 0);
         this.writeStudentsCache(response.content);
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.statsTotalStudents = Math.max(this.statsTotalStudents, this.students.length);
@@ -249,6 +256,7 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
           this.errorMessage = 'Impossible de charger les etudiants.';
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -256,10 +264,14 @@ export class EtudiantStudentsContentComponent implements OnInit, OnDestroy {
   private loadStats(): void {
     this.studentService.getStudentStats().subscribe({
       next: (stats: StudentStatsResponse) => {
+        this.statsTotalStudents = Number(stats.totalStudents ?? this.statsTotalStudents);
         this.statsGlobalAverage = Number(stats.globalAverage ?? 0);
         this.statsStudentsInAlert = Number(stats.studentsInAlert ?? 0);
+        this.totalPages = Math.max(this.totalPages, Math.ceil(this.statsTotalStudents / this.pageSize));
+        this.cdr.detectChanges();
       },
       error: () => {
+        this.cdr.detectChanges();
       },
     });
   }
