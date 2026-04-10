@@ -1,4 +1,4 @@
-name: deploy branch
+name: Deploy (main / develop)
 
 on:
   push:
@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      DOCKER_TOKEN:    ${{ secrets.DOCKER_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -39,7 +39,6 @@ jobs:
         with:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_TOKEN }}
-
       - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
@@ -47,14 +46,20 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_USERNAME }}/bda-backend:latest
 
-
+      - name: Build & push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.DOCKER_USERNAME }}/bda-frontend:latest
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     env:
-      SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_HOST:     ${{ secrets.SERVER_HOST }}
+      SERVER_USER:     ${{ secrets.SERVER_USER }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
     steps:
       - name: Check SSH secrets availability
         id: ssh_check
@@ -67,17 +72,17 @@ jobs:
 
       - name: Skip deploy (missing SSH secrets)
         if: ${{ steps.ssh_check.outputs.enabled != 'true' }}
-        run: echo "SSH secrets are missing. Skipping deploy job."
+        run: echo "SSH secrets are missing — skipping deploy."
 
       - name: Deploy via SSH
         if: ${{ steps.ssh_check.outputs.enabled == 'true' }}
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ env.SERVER_HOST }}
+          host:     ${{ env.SERVER_HOST }}
           username: ${{ env.SERVER_USER }}
-          key: ${{ env.SSH_PRIVATE_KEY }}
+          key:      ${{ env.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/bda-notes
             docker compose pull
             docker compose up -d --remove-orphans
-
+            docker image prune -f
